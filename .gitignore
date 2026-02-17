@@ -1,0 +1,6 @@
+# Systemdateien
+.DS_Store
+Thumbs.db
+
+# VS Code Einstellungen
+.vscode/
