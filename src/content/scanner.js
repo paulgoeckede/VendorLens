@@ -31,6 +31,9 @@ let sellerCache = {}; // Cache for seller information to avoid redundant fetches
 let isCacheLoaded = false; // flag to indicate if the cache has been loaded from storage
 let chinaCounter = 0; // global counter for products from China displayed in the extension icon
 
+const currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
+const activeConfig = localeConfigs[currentDomain] || localeConfigs["www.amazon.de."]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
+
 let config = {
     masterSwitch: true,
     hideChina: false,
@@ -93,7 +96,7 @@ const observer = new IntersectionObserver((entries, obs) => {
 function startScannerLoop() {
     setInterval(() => {
         if (!isCacheLoaded) return;
-        const products = document.querySelectorAll('div[data-component-type="s-search-result"]');
+        const products = document.querySelectorAll(activeConfig.productContainer);
 
         if (products.length > 0) {
             products.forEach(product => {
@@ -116,7 +119,7 @@ function startScan(product) {
     product.dataset.isScanned = "true";
     createBadgeElement(product, "Loading", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
 
-    const linkElement = product.querySelector('div[data-cy="title-recipe"] a');
+    const linkElement = product.querySelector(activeConfig.productLink);
 
     if (linkElement) {
         const randomDelay = Math.floor(Math.random() * 1500) + 500;
@@ -145,7 +148,7 @@ function startDeepScan(url, product) {
 
 
             // find merchant info box on product page
-            const merchantBox = doc.querySelector('div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]');
+            const merchantBox = doc.querySelector(activeConfig.merchantContainer);
 
             let sellerName = "";
             let sellerUrl = "";
@@ -154,7 +157,7 @@ function startDeepScan(url, product) {
             if (merchantBox) {
 
                 // check if there is a link to the seller profile (which is usually the case for third-party sellers)
-                const linkElement = merchantBox.querySelector('#sellerProfileTriggerId') ||
+                const linkElement = merchantBox.querySelector(activeConfig.merchantLink) ||
                     merchantBox.querySelector('a[href*="seller="]');
 
                 if (linkElement) {
@@ -224,7 +227,7 @@ function startDeepScan(url, product) {
                         const sellerDoc = parser.parseFromString(sellerResponse.html, "text/html");
 
                         // fetch imprint container
-                        const addressElement = sellerDoc.querySelector('div#page-section-detail-seller-info');
+                        const addressElement = sellerDoc.querySelector(activeConfig.imprintContainer);
 
                         if (addressElement) {
                             const addressText = addressElement.textContent.trim();
