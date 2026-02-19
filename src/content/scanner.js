@@ -89,7 +89,7 @@ function startScan(product) {
     if (product.dataset.isScanned) return;
 
     product.dataset.isScanned = "true";
-    createBadgeElement(product, "Loading", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
+    createBadgeElement(product, "Loading..", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
 
     const linkElement = product.querySelector(activeConfig.productLink);
 
@@ -370,10 +370,10 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
     if (iconFileName) {
         const icon = document.createElement("img");
         icon.src = chrome.runtime.getURL("assets/icons/" + iconFileName);
-        icon.style.width = "14px";
-        icon.style.height = "14px";
+        icon.style.width = "18px";
+        icon.style.height = "18px";
         icon.style.display = "block";
-        icon.style.filter = "drop-shadow(0px 1px 1px rgba(0,0,0,0.8))";
+        icon.style.filter = "drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.9))";
         badge.appendChild(icon);
     }
 

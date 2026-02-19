@@ -3,6 +3,7 @@
 - [x] add FR Support
 - [x] add ES Support
 - [x] add IT Support
+- [] more countries support
 - [x] handle neither EU nor Chinese Sellers properly
 - [] handle no seller info found (badge)
 - [] better logo
