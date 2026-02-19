@@ -5,5 +5,5 @@
 - [x] add IT Support
 - [] more countries support
 - [x] handle neither EU nor Chinese Sellers properly
-- [] handle no seller info found (badge)
-- [] better logo
+- [x] better logo
+- [] testing
