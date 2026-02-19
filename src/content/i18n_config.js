@@ -6,7 +6,13 @@ const localeConfigs = {
         productLink: 'div[data-cy="title-recipe"] a',
         merchantContainer: 'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]',
         merchantLink: '#sellerProfileTriggerId',
-        imprintContainer: 'div#page-section-detail-seller-info'
+        imprintContainer: 'div#page-section-detail-seller-info',
+        amazonKeywords: [
+            "amazon",
+            "amazon warehouse",
+            "amazon eu s.a.r.l.",
+            "amazon uk"
+        ]
     }
 }
 

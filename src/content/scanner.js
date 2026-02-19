@@ -1,25 +1,16 @@
 let sellerCache = {}; // Cache for seller information to avoid redundant fetches
 let isCacheLoaded = false; // flag to indicate if the cache has been loaded from storage
 let chinaCounter = 0; // global counter for products from China displayed in the extension icon
-
 let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
 currentDomain = currentDomain.replace("www.", "");
 const activeConfig = localeConfigs[currentDomain] || localeConfigs["main_config"]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
-
-// DEBUGGING
-console.log("Erkannte Domain: ", currentDomain);
-console.log("Geladene Config: ", activeConfig ? "Erfolgreich" : "FEHLT");
-
-if (!activeConfig) {
-    console.error("Kritischer Fehler: Weder die aktuelle Domain noch Fallback wurden in localeConfigs gefunden");
-    console.log("Verfügbare Schlüssel in localeConfigs: ", Object.keys(localeConfig));
-}
 
 let config = {
     masterSwitch: true,
     hideChina: false,
     markEU: true
 };
+
 
 // load config from storage and apply defaults if not set
 chrome.storage.sync.get(config, (items) => {
@@ -39,7 +30,7 @@ chrome.storage.local.get(["cachedSellers"], (result) => {
 });
 
 
-// listen for settings updates from the popup and update config accordingly
+// listen for settings updates from the extension popup and update config accordingly
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "updateSettings") {
         config = { ...config, ...request.settings };
@@ -149,21 +140,19 @@ function startDeepScan(url, product) {
                     if (sellerUrl && !sellerUrl.startsWith("http")) {
                         sellerUrl = "https://www." + currentDomain + sellerUrl;
                     }
-
-                    console.log("Zu fetchende URL:", sellerUrl);
                 }
-                // fallback: if there is no link, the seller is usually amazon itself, but we do a final check to be sure
+                // fallback: if there is no link, the seller is usually amazon itself, do a final check to be sure
                 else {
-                    const boxText = merchantBox.textContent.trim();
+                    const boxText = merchantBox.textContent.trim().toLowerCase();
 
-                    if (boxText.includes("Amazon") || boxText.includes("Amazon Warehouse") || boxText.includes("Amazon EU S.a.r.l.") || boxText.includes("Amazon UK")) {
+                    if (activeConfig.amazonKeywords.some(keyword => boxText.includes(keyword))) {
                         sellerName = "Amazon";
                         isAmazon = true;
                     }
                 }
             } else {
-                console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
-                // Optional: product.style.borderColor = "gray";
+                //console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
+                // product.style.borderColor = "gray";
                 return;
             }
 
@@ -199,7 +188,7 @@ function startDeepScan(url, product) {
 
             // case: third party seller
             if (sellerUrl) {
-                console.log("Händler neu: " + sellerName + ". Lade Impressum...");
+                // console.log("Händler neu: " + sellerName + ". Lade Impressum...");
 
                 // fetch seller profile page through background script
                 chrome.runtime.sendMessage({
@@ -235,7 +224,7 @@ function startDeepScan(url, product) {
                             chrome.storage.local.set({ cachedSellers: sellerCache });
                             applyBadge(product, resultData);
                         } else {
-                            console.log("Impressum nicht gefunden für: " + sellerName);
+                            // console.log("Impressum nicht gefunden für: " + sellerName);
                         }
                     }
                 });
@@ -318,20 +307,28 @@ function applyBadge(product, data) {
 
         // product.style.border = "4px solid #d00";
         createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png");
-    }
-
-    else if (data.name === "Amazon") {
+    
+    } else if (data.name === "Amazon") {
 
         // product.style.border = "4px solid #2196F3";
         createBadgeElement(product, "Amazon", "#2196F3", "white", "logo-128.png");
 
         return;
+
     } else if (data.isEU && config.markEU) {
 
         // product.style.border = "4px solid #388e3c";
         createBadgeElement(product, "EU Seller", "#388e3c", "white", "logo-128.png");
 
         return;
+    } else {
+        // product is neither from China, EU or Amazon
+
+        const oldBadge = product.querySelector(".custom-badge");
+
+        if (oldBadge) {
+            oldBadge.remove();
+        }
     }
 }
 
