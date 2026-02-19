@@ -33,7 +33,7 @@ let chinaCounter = 0; // global counter for products from China displayed in the
 
 let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
 currentDomain = currentDomain.replace("www.", "");
-const activeConfig = localeConfigs[currentDomain] || localeConfigs["amazon.de"]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
+const activeConfig = localeConfigs[currentDomain] || localeConfigs["main_config"]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
 
 // DEBUGGING
 console.log("Erkannte Domain: ", currentDomain);
@@ -176,8 +176,10 @@ function startDeepScan(url, product) {
 
                     // repair relative URLs
                     if (sellerUrl && !sellerUrl.startsWith("http")) {
-                        sellerUrl = "https://www.amazon.de" + sellerUrl;
+                        sellerUrl = "https://www." + currentDomain + sellerUrl;
                     }
+
+                    console.log("Zu fetchende URL:", sellerUrl);
                 }
                 // fallback: if there is no link, the seller is usually amazon itself, but we do a final check to be sure
                 else {
@@ -189,7 +191,7 @@ function startDeepScan(url, product) {
                     }
                 }
             } else {
-                // console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
+                console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
                 // Optional: product.style.borderColor = "gray";
                 return;
             }
@@ -226,7 +228,7 @@ function startDeepScan(url, product) {
 
             // case: third party seller
             if (sellerUrl) {
-                // console.log("Händler neu: " + sellerName + ". Lade Impressum...");
+                console.log("Händler neu: " + sellerName + ". Lade Impressum...");
 
                 // fetch seller profile page through background script
                 chrome.runtime.sendMessage({
@@ -262,7 +264,7 @@ function startDeepScan(url, product) {
                             chrome.storage.local.set({ cachedSellers: sellerCache });
                             applyBadge(product, resultData);
                         } else {
-                            // console.log("Impressum nicht gefunden für: " + sellerName);
+                            console.log("Impressum nicht gefunden für: " + sellerName);
                         }
                     }
                 });
@@ -368,7 +370,7 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
     // remove loading badge or previous badge
     const oldBadge = parent.querySelector(".custom-badge");
     if (oldBadge) {
-        console.log("Found previous badge: " + oldBadge);
+        // console.log("Found previous badge: " + oldBadge);
         oldBadge.remove();
     }
 

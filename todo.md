@@ -1,7 +1,8 @@
 - [x] add UK Support
 - [] add US Support
-- [] add FR Support
-- [] add ES Support
-- [] add IT Support
+- [x] add FR Support
+- [x] add ES Support
+- [x] add IT Support
 - [] handle neither EU nor Chinese Sellers properly
+- [] handle no seller info found (badge)
 - [] better logo
