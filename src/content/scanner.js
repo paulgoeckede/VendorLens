@@ -31,8 +31,18 @@ let sellerCache = {}; // Cache for seller information to avoid redundant fetches
 let isCacheLoaded = false; // flag to indicate if the cache has been loaded from storage
 let chinaCounter = 0; // global counter for products from China displayed in the extension icon
 
-const currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
-const activeConfig = localeConfigs[currentDomain] || localeConfigs["www.amazon.de."]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
+let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
+currentDomain = currentDomain.replace("www.", "");
+const activeConfig = localeConfigs[currentDomain] || localeConfigs["amazon.de"]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
+
+// DEBUGGING
+console.log("Erkannte Domain: ", currentDomain);
+console.log("Geladene Config: ", activeConfig ? "Erfolgreich" : "FEHLT");
+
+if (!activeConfig) {
+    console.error("Kritischer Fehler: Weder die aktuelle Domain noch Fallback wurden in localeConfigs gefunden");
+    console.log("Verfügbare Schlüssel in localeConfigs: ", Object.keys(localeConfig));
+}
 
 let config = {
     masterSwitch: true,

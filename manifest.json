@@ -8,7 +8,12 @@
         "storage"
     ],
     "host_permissions": [
-        "*://*.amazon.de/*"
+        "*://*.amazon.de/*",
+        "*://*.amazon.com/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.es/*"
     ],
     "action": {
         "default_popup": "./src/popup/hello.html",
@@ -16,7 +21,14 @@
     },
     "content_scripts": [
         {
-            "matches": ["*://*.amazon.de/*"],
+            "matches": [
+                "*://*.amazon.de/*",
+                "*://*.amazon.com/*",
+                "*://*.amazon.co.uk/*",
+                "*://*.amazon.fr/*",
+                "*://*.amazon.it/*",
+                "*://*.amazon.es/*"
+        ],
             "js": ["./src/content/i18n_config.js", "./src/content/scanner.js"]
         }
     ],
@@ -33,7 +45,14 @@
     "web_accessible_resources": [
         {
             "resources": ["assets/icons/*"],
-            "matches": ["*://*.amazon.de/*", "*://*.amazon.com/*"]
+            "matches": [
+                "*://*.amazon.de/*",
+                "*://*.amazon.com/*",
+                "*://*.amazon.co.uk/*",
+                "*://*.amazon.fr/*",
+                "*://*.amazon.it/*",
+                "*://*.amazon.es/*"
+            ]
         }
     ]
 }
