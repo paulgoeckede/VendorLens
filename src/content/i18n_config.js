@@ -2,8 +2,8 @@
 
 const localeConfigs = {
     "main_config": {
-        productContainer: 'div[data-component-type="s-search-result"]',
-        productLink: 'div[data-cy="title-recipe"] a',
+        productContainer: 'div[data-component-type="s-search-result"], div[id^="anonCarousel"] li',
+        productLink: 'a',
         merchantContainer: 'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]',
         merchantLink: '#sellerProfileTriggerId',
         imprintContainer: 'div#page-section-detail-seller-info',

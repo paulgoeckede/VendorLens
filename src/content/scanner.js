@@ -94,22 +94,18 @@ function startScan(product) {
     // scan all link elements for a valid ASIN and build the product URL
     for (let link of allLinks) {
         let href = link.getAttribute("href");
-        if (!href) continue;
+        if (!href || href === "#" || href.includes("javascript.")) continue;
 
-        const asinMatch = href.match(/\/(?:dp|product)\/([A-Z0-9]{10})/i);
-        const encodedAsinMatch = href.match(/%2F(?:dp|product)%2F([A-Z0-9]{10})/i);
+        let foundAsin = extractAsinFromUrl(href);
 
-        if (asinMatch && asinMatch[1]) {
-            cleanUrl = "/dp/" + asinMatch[1];
-            break;
-        } else if (encodedAsinMatch && encodedAsinMatch[1]) {
-            cleanUrl = "/dp/" + encodedAsinMatch[1];
+        if (foundAsin) {
+            cleanUrl = "/dp/" + foundAsin;
             break;
         }
     }
 
     if (!cleanUrl) {
-        // console.log("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.");
+        // console.log("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.", product);
         return;
     }
 
@@ -402,4 +398,35 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
     badge.appendChild(textSpan);
 
     parent.appendChild(badge);
+}
+
+
+function extractAsinFromUrl(url) {
+    if (!url) return null;
+
+    try {
+        let decodedUrl = url;
+
+        // decode url
+        while (decodedUrl.includes("%2F") || decodedUrl.includes("%252F")) {
+            decodedUrl = decodeURIComponent(decodedUrl);
+        }
+
+        const regex = /(?:\/dp\/|\/product\/|\/d\/|\/aw\/d\/|asin=)([A-Z0-9]{10})(?:[/?&]|$)/i; // to filter out asin in url
+        const match = decodedUrl.match(regex);
+
+        if (match && match[1]) {
+            return match[1];
+        }
+
+        // bruteforce fallback, most asins start with B0
+        const b0Match = decodedUrl.match(/(B0[A-Z0-9]{8})/);
+        if (b0Match && b0Match[1]) {
+            return b0Match[1];
+        }
+    } catch (e) {
+
+    }
+
+    return null;
 }
