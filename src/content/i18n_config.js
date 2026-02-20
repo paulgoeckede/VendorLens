@@ -11,7 +11,10 @@ const localeConfigs = {
             "amazon",
             "amazon warehouse",
             "amazon eu s.a.r.l.",
-            "amazon uk"
+            "amazon uk",
+            "amazon media eu sarl",
+            "amazon media",
+            "amazon sarl"
         ]
     }
 }

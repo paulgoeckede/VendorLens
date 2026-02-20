@@ -106,6 +106,7 @@ function startScan(product) {
 
     if (!cleanUrl) {
         // console.log("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.", product);
+        removeBadge(product);
         return;
     }
 
@@ -148,8 +149,20 @@ function startDeepScan(url, product) {
                 // check if there is a link to the seller profile (which is usually the case for third-party sellers)
                 const linkElement = merchantBox.querySelector(activeConfig.merchantLink) ||
                     merchantBox.querySelector('a[href*="seller="]');
-
+                
+                let sellerText = "";
+                
                 if (linkElement) {
+                    sellerText = linkElement.textContent.trim().toLowerCase();
+                } else {
+                    sellerText = merchantBox.textContent.trim().toLowerCase();
+                }
+
+                if (sellerText.includes("amazon")) {
+                    sellerName = "Amazon";
+                    isAmazon = true;
+                }
+                else if (linkElement) {
                     sellerName = linkElement.textContent.trim();
                     sellerUrl = linkElement.getAttribute("href");
 
@@ -158,23 +171,16 @@ function startDeepScan(url, product) {
                         sellerUrl = "https://www." + currentDomain + sellerUrl;
                     }
                 }
-                // fallback: if there is no link, the seller is usually amazon itself, do a final check to be sure
-                else {
-                    const boxText = merchantBox.textContent.trim().toLowerCase();
-
-                    if (activeConfig.amazonKeywords.some(keyword => boxText.includes(keyword))) {
-                        sellerName = "Amazon";
-                        isAmazon = true;
-                    }
-                }
             } else {
                 // console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
+                removeBadge(product);
                 return;
             }
 
             // final check to avoid empty seller names
             if (!sellerName) {
                 // console.log("Container gefunden, aber Name leer.");
+                removeBadge(product);
                 return;
             }
 
@@ -241,6 +247,7 @@ function startDeepScan(url, product) {
                             applyBadge(product, resultData);
                         } else {
                             // console.log("Impressum nicht gefunden für: " + sellerName);
+                            removeBadge(product);
                         }
                     }
                 });
@@ -249,6 +256,7 @@ function startDeepScan(url, product) {
         } else {
             // Fehlerbehandlung für den ersten Fetch
             // console.log("Konnte Produktseite nicht laden.");
+            removeBadge(product);
         }
     });
 }
@@ -351,12 +359,8 @@ function applyBadge(product, data) {
 
 // helper function to create and style a badge element and append it to the product card
 function createBadgeElement(parent, text, color, textcolor, iconFileName) {
-    // remove loading badge or previous badge
-    const oldBadge = parent.querySelector(".custom-badge");
-    if (oldBadge) {
-        // console.log("Found previous badge: " + oldBadge);
-        oldBadge.remove();
-    }
+    // remove old badge if there is one
+    removeBadge(parent);
 
     parent.style.position = "relative";
 
@@ -398,6 +402,15 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
     badge.appendChild(textSpan);
 
     parent.appendChild(badge);
+}
+
+
+function removeBadge(parent) {
+    // remove loading badge or previous badge
+    const oldBadge = parent.querySelector(".custom-badge");
+    if (oldBadge) {
+        oldBadge.remove();
+    }
 }
 
 
