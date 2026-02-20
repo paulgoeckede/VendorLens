@@ -88,19 +88,40 @@ function startScan(product) {
 
     if (product.dataset.isScanned) return;
 
+    const allLinks = product.querySelectorAll(activeConfig.productLink); 
+    let cleanUrl = null;
+
+    // scan all link elements for a valid ASIN and build the product URL
+    for (let link of allLinks) {
+        let href = link.getAttribute("href");
+        if (!href) continue;
+
+        const asinMatch = href.match(/\/(?:dp|product)\/([A-Z0-9]{10})/i);
+        const encodedAsinMatch = href.match(/%2F(?:dp|product)%2F([A-Z0-9]{10})/i);
+
+        if (asinMatch && asinMatch[1]) {
+            cleanUrl = "/dp/" + asinMatch[1];
+            break;
+        } else if (encodedAsinMatch && encodedAsinMatch[1]) {
+            cleanUrl = "/dp/" + encodedAsinMatch[1];
+            break;
+        }
+    }
+
+    if (!cleanUrl) {
+        // console.log("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.");
+        return;
+    }
+
     product.dataset.isScanned = "true";
     createBadgeElement(product, "Loading..", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
 
-    const linkElement = product.querySelector(activeConfig.productLink);
+    const fetchUrl = "https://" + currentDomain + cleanUrl;
 
-    if (linkElement) {
-        const randomDelay = Math.floor(Math.random() * 1500) + 500;
-        setTimeout(() => {
-            startDeepScan(linkElement.href, product);
-        }, randomDelay);
-    } else {
-        // console.log("Kein Link auf der Produktkarte gefunden.");
-    }
+    const randomDelay = Math.floor(Math.random() * 1500) + 500;
+    setTimeout(() => {
+        startDeepScan(fetchUrl, product);
+    }, randomDelay);
 }
 
 
@@ -151,8 +172,7 @@ function startDeepScan(url, product) {
                     }
                 }
             } else {
-                //console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
-                // product.style.borderColor = "gray";
+                // console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
                 return;
             }
 
