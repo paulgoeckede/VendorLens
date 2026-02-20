@@ -74,6 +74,7 @@ function startScannerLoop() {
             products.forEach(product => {
                 if (product.dataset.isObserved) return;
 
+                createBadgeElement(product, "Found!", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
                 product.dataset.isObserved = "true";
 
                 observer.observe(product);
@@ -116,7 +117,7 @@ function startScan(product) {
     }
 
     if (!cleanUrl) {
-        // console.log("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.", product);
+        ("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.", product);
         removeBadge(product);
         return;
     }
@@ -306,6 +307,7 @@ function isChinaSeller(text) {
 
     if (text.includes("CN")) return true;
     if (text.includes("CHN")) return true;
+    if (text.includes("HK")) return true;
 
     return false;
 }
