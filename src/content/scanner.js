@@ -199,7 +199,6 @@ function startDeepScan(url, product) {
             if (sellerCache[sellerName]) {
                 const cachedData = sellerCache[sellerName];
                 applyBadge(product, cachedData);
-                if (cachedData.isFromChina) incrementChinaCounter();
 
                 // save asin info to session cache
                 const foundAsin = extractAsinFromUrl(sellerUrl);
@@ -257,8 +256,6 @@ function startDeepScan(url, product) {
                             if (!isFromChina) {
                                 isEU = isEUSeller(addressText); // if not from China, check if it's from the EU based on the imprint information
                             }
-
-                            if (isFromChina) incrementChinaCounter();
 
                             const resultData = {
                                 isFromChina: isFromChina,
@@ -365,6 +362,7 @@ function applyBadge(product, data, sellerUrl) {
 
         // product.style.border = "4px solid #d00";
         createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png", data.sellerUrl);
+        incrementChinaCounter();
     
     } else if (data.name === "Amazon") {
 
