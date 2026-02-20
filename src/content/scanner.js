@@ -187,7 +187,7 @@ function startDeepScan(url, product) {
             // check if we already have information about this seller in our cache to avoid unnecessary fetches of the seller profile page
             if (sellerCache[sellerName]) {
                 const cachedData = sellerCache[sellerName];
-                applyBadge(product, cachedData);
+                applyBadge(product, cachedData, sellerUrl);
                 if (cachedData.isFromChina) incrementChinaCounter();
                 return;
             }
@@ -244,7 +244,7 @@ function startDeepScan(url, product) {
                             // store and cache the results for this seller to speed up future scans of products from the same seller and reduce the number of fetches needed
                             sellerCache[sellerName] = resultData;
                             chrome.storage.local.set({ cachedSellers: sellerCache });
-                            applyBadge(product, resultData);
+                            applyBadge(product, resultData, sellerUrl);
                         } else {
                             // console.log("Impressum nicht gefunden für: " + sellerName);
                             removeBadge(product);
@@ -297,7 +297,7 @@ function isEUSeller(text) {
 
 
 // function to apply a badge to the product element based on the seller information and user settings
-function applyBadge(product, data) {
+function applyBadge(product, data, sellerUrl) {
 
     if (!config.masterSwitch) return;
 
@@ -330,7 +330,7 @@ function applyBadge(product, data) {
         }
 
         // product.style.border = "4px solid #d00";
-        createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png");
+        createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png", sellerUrl);
     
     } else if (data.name === "Amazon") {
 
@@ -342,7 +342,7 @@ function applyBadge(product, data) {
     } else if (data.isEU && config.markEU) {
 
         // product.style.border = "4px solid #388e3c";
-        createBadgeElement(product, "EU Seller", "#388e3c", "white", "logo-128.png");
+        createBadgeElement(product, "EU Seller", "#388e3c", "white", "logo-128.png", sellerUrl);
 
         return;
     } else {
@@ -358,7 +358,7 @@ function applyBadge(product, data) {
 
 
 // helper function to create and style a badge element and append it to the product card
-function createBadgeElement(parent, text, color, textcolor, iconFileName) {
+function createBadgeElement(parent, text, color, textcolor, iconFileName, sellerUrl) {
     // remove old badge if there is one
     removeBadge(parent);
 
@@ -381,7 +381,7 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
         font-size: 11px; 
         border-bottom-right-radius: 4px;
         border-radius: 5px; 
-        box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
+        drop-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
         pointer-events: none; 
         background-color: ${color}; 
         color: ${textcolor};
@@ -395,6 +395,30 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName) {
         icon.style.display = "block";
         icon.style.filter = "drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.9))";
         badge.appendChild(icon);
+    }
+
+    // apply seller imprint link and hover effects to badges in case of third party seller
+    if (sellerUrl) {
+        badge.style.cursor = "pointer";
+
+        badge.style.pointerEvents = "auto";
+        badge.style.transition = "all 0.2s ease-in-out";
+
+        badge.addEventListener("mouseenter", () => {
+            badge.style.transform = "scale(1.05)";
+            badge.style.filter = "drop-shadow(0px 4px 4px rgba(0,0,0,0.3))";
+        });
+
+        badge.addEventListener("mouseleave", () => {
+            badge.style.transform = "scale(1)";
+            badge.style.filter = "drop-shadow: 1px 1px 3px rgba(0,0,0,0.2)";
+        });
+
+        badge.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(sellerUrl, "_blank");
+        });
     }
 
     const textSpan = document.createElement("span");
