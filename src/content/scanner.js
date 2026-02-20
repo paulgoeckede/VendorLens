@@ -100,6 +100,17 @@ function startScan(product) {
 
         if (foundAsin) {
             cleanUrl = "/dp/" + foundAsin;
+
+            const cachedData = sessionStorage.getItem("asin_cache_" + foundAsin);
+
+            // completely skip background fetch if ASIN number is found in session cache
+            if (cachedData) {
+                const sellerInfo = JSON.parse(cachedData);
+                product.dataset.isScanned = "true";
+
+                applyBadge(product, sellerInfo)
+                return;
+            }
             break;
         }
     }
@@ -187,8 +198,15 @@ function startDeepScan(url, product) {
             // check if we already have information about this seller in our cache to avoid unnecessary fetches of the seller profile page
             if (sellerCache[sellerName]) {
                 const cachedData = sellerCache[sellerName];
-                applyBadge(product, cachedData, sellerUrl);
+                applyBadge(product, cachedData);
                 if (cachedData.isFromChina) incrementChinaCounter();
+
+                // save asin info to session cache
+                const foundAsin = extractAsinFromUrl(sellerUrl);
+                if (foundAsin) {
+                    sessionStorage.setItem("asin_cache_" + foundAsin, JSON.stringify(cachedData));
+                }
+
                 return;
             }
 
@@ -198,13 +216,21 @@ function startDeepScan(url, product) {
                     isFromChina: false,
                     isEU: false,
                     name: "Amazon",
-                    text: "Verkauf und Versand durch Amazon"
+                    sellerUrl: "",
+                    text: "Verkauf und Versand durch Amazon"                   
                 };
 
                 // store and cache the results, apply badge, and return early since we don't need to fetch a seller profile for Amazon itself
                 sellerCache["Amazon"] = resultData;
                 chrome.storage.local.set({ cachedSellers: sellerCache });
                 applyBadge(product, resultData);
+
+                // save asin info to session cache
+                const foundAsin = extractAsinFromUrl(sellerUrl);
+                if (foundAsin) {
+                    sessionStorage.setItem("asin_cache_" + foundAsin, JSON.stringify(resultData));
+                }
+
                 return;
             }
 
@@ -238,13 +264,21 @@ function startDeepScan(url, product) {
                                 isFromChina: isFromChina,
                                 isEU: isEU,
                                 name: sellerName,
+                                sellerUrl: sellerUrl,
                                 text: addressText
                             };
 
                             // store and cache the results for this seller to speed up future scans of products from the same seller and reduce the number of fetches needed
                             sellerCache[sellerName] = resultData;
                             chrome.storage.local.set({ cachedSellers: sellerCache });
-                            applyBadge(product, resultData, sellerUrl);
+                            applyBadge(product, resultData);
+
+                            // save asin info to session cache
+                            const foundAsin = extractAsinFromUrl(sellerUrl);
+                            if (foundAsin) {
+                                sessionStorage.setItem("asin_cache_" + foundAsin, JSON.stringify(resultData));
+                            }
+
                         } else {
                             // console.log("Impressum nicht gefunden für: " + sellerName);
                             removeBadge(product);
@@ -330,7 +364,7 @@ function applyBadge(product, data, sellerUrl) {
         }
 
         // product.style.border = "4px solid #d00";
-        createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png", sellerUrl);
+        createBadgeElement(product, "Chinese Seller", "#d00", "white", "logo-128.png", data.sellerUrl);
     
     } else if (data.name === "Amazon") {
 
@@ -342,7 +376,7 @@ function applyBadge(product, data, sellerUrl) {
     } else if (data.isEU && config.markEU) {
 
         // product.style.border = "4px solid #388e3c";
-        createBadgeElement(product, "EU Seller", "#388e3c", "white", "logo-128.png", sellerUrl);
+        createBadgeElement(product, "EU Seller", "#388e3c", "white", "logo-128.png", data.sellerUrl);
 
         return;
     } else {
