@@ -3,7 +3,7 @@ let isCacheLoaded = false; // flag to indicate if the cache has been loaded from
 let chinaCounter = 0; // global counter for products from China displayed in the extension icon
 let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
 currentDomain = currentDomain.replace("www.", "");
-const activeConfig = localeConfigs[currentDomain] || localeConfigs["main_config"]; // grab corresponding querySelector keywords from localeConfigs, amazon.de as fallback
+const activeConfig = localeConfigs[currentDomain] || localeConfigs["main_config"]; // grab corresponding querySelector keywords from localeConfigs, main_config as default
 
 let config = {
     masterSwitch: true,
@@ -117,7 +117,6 @@ function startScan(product) {
     }
 
     if (!cleanUrl) {
-        ("Keine gültige ASIN auf der Produktkarte gefunden. Überspringe Produkt.", product);
         removeBadge(product);
         return;
     }
@@ -183,7 +182,7 @@ function startDeepScan(url, product) {
                         sellerUrl = "https://www." + currentDomain + sellerUrl;
                     }
                 }
-            } else {
+            } else { // Wenn kein Verkäufer Container auf der Produktseite gefunden wurde.
                 // console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
                 removeBadge(product);
                 return;
@@ -303,7 +302,9 @@ function isChinaSeller(text) {
     const hasKeyword = chinaKeywords.some(keyword => lowerText.includes(keyword));
     if (hasKeyword) return true;
 
-    if (text.includes("+86")) return true;
+    if (text.includes("+86")) return true; // China
+    if (text.includes("+852")) return true; // Hongkong
+
 
     if (text.includes("CN")) return true;
     if (text.includes("CHN")) return true;
@@ -462,8 +463,8 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName, seller
 }
 
 
+// function to remove an existing badge from product Container
 function removeBadge(parent) {
-    // remove loading badge or previous badge
     const oldBadge = parent.querySelector(".custom-badge");
     if (oldBadge) {
         oldBadge.remove();
@@ -471,6 +472,7 @@ function removeBadge(parent) {
 }
 
 
+// function to extract a products ASIN from a given url
 function extractAsinFromUrl(url) {
     if (!url) return null;
 

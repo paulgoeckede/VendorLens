@@ -1,9 +1,0 @@
-- [x] add UK Support
-- [x] add US Support
-- [x] add FR Support
-- [x] add ES Support
-- [x] add IT Support
-- [] more countries support
-- [x] handle neither EU nor Chinese Sellers properly
-- [x] better logo
-- [] testing
