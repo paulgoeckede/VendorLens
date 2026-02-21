@@ -1,6 +1,6 @@
 {
     "name": "VendorLens - Seller Info for Amazon",
-    "description": "An extension to check seller information on Amazon.",
+    "description": "Instantly reveal Amazon seller origins. Filter out unwanted regions, display badges with seller information, and shop smarter. 100% local, no data tracking.",
     "version": "1.0",
     "manifest_version": 3,
     "permissions": [
