@@ -16,8 +16,8 @@
         "*://*.amazon.es/*"
     ],
     "action": {
-        "default_popup": "./src/popup/hello.html",
-        "default_icon": "./assets/icons/logo-128.png"
+        "default_popup": "src/popup/hello.html",
+        "default_icon": "assets/icons/logo-128.png"
     },
     "content_scripts": [
         {
@@ -29,11 +29,11 @@
                 "*://*.amazon.it/*",
                 "*://*.amazon.es/*"
         ],
-            "js": ["./src/content/i18n_config.js", "./src/content/scanner.js"]
+            "js": ["src/content/i18n_config.js", "src/content/scanner.js"]
         }
     ],
     "background": {
-        "service_worker": "./src/background/background.js"
+        "service_worker": "src/background/background.js"
     },
     "icons": {
         "16": "assets/icons/logo-16.png",
