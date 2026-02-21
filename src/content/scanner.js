@@ -427,7 +427,6 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName, seller
         icon.style.width = "18px";
         icon.style.height = "18px";
         icon.style.display = "block";
-        icon.style.filter = "drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.9))";
         badge.appendChild(icon);
     }
 

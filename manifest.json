@@ -1,5 +1,5 @@
 {
-    "name": "Seller Check for Amazon",
+    "name": "VendorLens - Seller Info for Amazon",
     "description": "An extension to check seller information on Amazon.",
     "version": "1.0",
     "manifest_version": 3,
