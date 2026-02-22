@@ -4,66 +4,82 @@
 
 # VendorLens
 
-VendorLens ist eine Browser-Erweiterung für Google Chrome und Mozilla Firefox, die Produkt- und Händlerinformationen auf Amazon analysiert. Sie hilft dabei, Verkäufer aus bestimmten Regionen (wie China oder der EU) direkt auf der Suchergebnisseite transparent zu markieren oder auszublenden.
+VendorLens is a browser extension for Google Chrome and Mozilla Firefox that analyzes product and seller information on Amazon. It helps to transparently highlight or hide sellers from specific regions (such as China or the EU) directly on the search results page.
 
 ## Features
 
-* **Händler-Erkennung:** Automatische Analyse der Verkäuferdaten im Hintergrund.
-* **Visuelle Badges:** Hebt EU-Händler und andere definierte Verkäufergruppen optisch hervor.
-* **Filter-Funktion (Hide China):** Blendet Produkte von chinesischen Händlern auf Wunsch komplett aus den Suchergebnissen aus.
-* **Badge-Counter:** Zählt gefundene Händler und zeigt die Anzahl direkt am Extension-Icon an.
-* **Master-Switch:** Die gesamte Erweiterung lässt sich mit einem Klick im Popup de- oder aktivieren.
+* **Seller Detection:** Automatic analysis of seller data in the background.
+* **Visual Badges:** Visually highlights EU sellers and other defined seller groups.
+* **Filter Function (Hide China):** Completely hides products from Chinese sellers from the search results if desired.
+* **Badge Counter:** Counts the detected sellers and displays the number directly on the extension icon.
+* **Master Switch:** The entire extension can be activated or deactivated with a single click in the popup.
 
-## Architektur & Tech Stack
+## Architecture & Tech Stack
 
-Das Projekt nutzt eine einheitliche Codebasis (Single Source of Truth) im `app/`-Ordner und generiert über ein Node.js-Build-Skript automatisch die passenden Manifest-Dateien für Chrome (Manifest V3 mit Service Worker) und Firefox (Manifest V3 mit Background Scripts).
+The project uses a single codebase in the `app/` directory and automatically generates the appropriate manifest files for Chrome (Manifest V3 with Service Worker) and Firefox (Manifest V3 with Background Scripts) via a Node.js build script.
 
-* **Vanilla JavaScript** (keine externen Frameworks)
-* **Manifest V3**
-* **Node.js** (für den Build-Prozess)
+* **Vanilla JavaScript:** No external frameworks for the extension logic.
+* **Manifest V3:** Modern standard for browser extensions.
+* **Node.js:** For the build process.
+* **Jest & JSDOM:** For automated unit and DOM testing.
 
-## Entwicklung & Build-Prozess
+## Development & Build Process
 
-Um an der Extension zu arbeiten oder die fertigen Dateien für den Browser zu generieren, benötigst du [Node.js](https://nodejs.org/).
+To work on the extension or generate the final files for the browser, you need Node.js.
 
-1. Klone das Repository.
-2. Nimm deine Code-Änderungen ausschließlich im `app/`-Ordner vor.
-3. Führe das Build-Skript im Hauptverzeichnis aus:
+1. Clone the repository.
+2. Run `npm install` to install the development dependencies (like Jest).
+3. Make your code changes exclusively in the `app/` directory.
+4. Run the build script in the root directory:
 
     ```bash
     npm run build
     ```
 
-**Ablauf des Build-Prozesses:**
-1. Die Verzeichnisse dist/ und releases/ werden bereinigt.
-2. Die Quelldateien aus dem Ordner app/ werden für Chrome und Firefox getrennt aufbereitet.
-3. Die Versionsnummer aus der package.json wird automatisch in die Manifest-Dateien und in die HTML-Datei unter app/src/popup/hello.html geschrieben.
-4. Fertige Archiv-Dateien (.zip) inklusive Versionsnummer im Namen werden im Ordner releases/ erstellt.
+**Build Process Flow:**
+* The dist/ and releases/ directories are cleared.
+* The source files from the app/ directory are processed separately for Chrome and Firefox.
+* The version number from package.json is automatically written into the manifest files and the HTML file at app/src/popup/hello.html.
+* Finished archive files (.zip) including the version number in the name are created in the releases/ directory.
 
-## Lokales Testen
+## Automated Tests
+
+The project features an isolated test architecture to secure the core logic and DOM manipulations without having to start a browser.
+
+Run all tests with the following command:
+
+    ```bash
+    npm run test
+    ```
+
+* **Logic Tests:** Verify pure data functions (e.g., ASIN extraction, origin analysis).
+* **DOM Tests:** Use JSDOM to verify the creation and manipulation of HTML elements (badges, hiding products).
+
+## Local Testing in Browser
 
 **Google Chrome:**
-1. Navigiere zu `chrome://extensions/`
-2. Aktiviere oben rechts den "Entwicklermodus".
-3. Klicke auf "Entpackte Erweiterung laden" und wähle den Ordner `dist/chrome` aus.
+1. Navigate to `chrome://extensions/`
+2. Enable "Developer mode" in the top right corner.
+3. Click on "Load unpacked" and select the `dist/chrome` directory.
 
 **Mozilla Firefox:**
-1. Navigiere zu `about:debugging`
-2. Klicke links auf "Dieser Firefox".
-3. Klicke auf "Temporäres Add-on laden..." und wähle die `manifest.json` aus dem Ordner `dist/firefox` aus.
+1. Navigate to `about:debugging`
+2. Click on "This Firefox" on the left.
+3. Click on "Load Temporary Add-on..." and select the `manifest.json` from the `dist/firefox` directory.
 
-## Projektstruktur
+## Project Structure
 
-| Verzeichnis / Datei | Beschreibung |
+| Directory / File | Description |
 | :--- | :--- |
-| app/ | Quellcode der Erweiterung (HTML, JS, CSS, Icons). |
-| dist/ | Vom Build-Skript generierte, lauffähige Browser-Ordner. |
-| releases/ | Automatisch generierte Zip-Archive für den Store-Upload. |
-| build.js | Das Automatisierungsskript für Build und Packaging. |
-| package.json | Zentrale Projektkonfiguration, Versionierung und Abhängigkeiten. |
+| app/ | Source code of the extension (HTML, JS, CSS, Icons). |
+| tests/ | Automated test files (Jest). |
+| dist/ | Runnable browser directories generated by the build script. |
+| releases/ | Automatically generated zip archives for store upload. |
+| build.js | The automation script for building and packaging. |
+| package.json | Central project configuration, versioning, and dependencies. |
 
+## License
 
-## Lizenz
+All Rights Reserved
 
-Alle Rechte Vorbehalten
-Die Nutzung, Vervielfältigung oder Verbreitung des Codes ist ohne ausdrückliche Genehmigung des Urhebers nicht gestattet.
+The use, reproduction, or distribution of this code is not permitted without explicit permission from the author. 
