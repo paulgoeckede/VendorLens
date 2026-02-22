@@ -4,9 +4,13 @@
   "description": "Amazon Merchant Region Detector",
   "main": "build.js",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "test": "jest"
   },
   "dependencies": {
     "adm-zip": "^0.5.10"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
   }
 }
