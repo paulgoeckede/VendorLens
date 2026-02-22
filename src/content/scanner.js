@@ -360,6 +360,8 @@ function applyBadge(product, data, sellerUrl) {
                 product.style.display = "none";
             }, 500);
 
+            incrementChinaCounter();
+
             return;
         }
 

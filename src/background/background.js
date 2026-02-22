@@ -1,7 +1,7 @@
 // listens for messages from the content script and performs actions like fetching product pages and updating badge counts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse)  => {
     if (request.action === "fetchPage") {
-        console.log("Analyse des Produkts gestartet für URL:", request.url);
+        // console.log("Analyse des Produkts gestartet für URL:", request.url);
 
         // Fetch the product page HTML and send it back to the content script for analysis
         fetch(request.url)

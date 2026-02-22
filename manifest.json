@@ -3,6 +3,11 @@
     "description": "Reveal Amazon vendor origins. Filter out unwanted regions, display badges, and shop smarter. 100% local, no data tracking.",
     "version": "1.0",
     "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "vendorlens.app@gmail.com"
+        }
+    },
     "permissions": [
         "storage"
     ],
@@ -32,7 +37,10 @@
         }
     ],
     "background": {
-        "service_worker": "src/background/background.js"
+        "service_worker": "src/background/background.js",
+        "scripts": [
+            "src/background/background.js"
+        ]
     },
     "icons": {
         "16": "assets/icons/logo-16.png",
