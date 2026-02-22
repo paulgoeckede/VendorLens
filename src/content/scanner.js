@@ -73,8 +73,6 @@ function startScannerLoop() {
         if (products.length > 0) {
             products.forEach(product => {
                 if (product.dataset.isObserved) return;
-
-                createBadgeElement(product, "Found!", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
                 product.dataset.isObserved = "true";
 
                 observer.observe(product);
