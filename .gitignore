@@ -4,3 +4,6 @@ Thumbs.db
 
 # VS Code Einstellungen
 .vscode/
+
+# distribution
+dist/
