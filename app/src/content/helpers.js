@@ -75,3 +75,13 @@ if (typeof module !== 'undefined' && module.exports) {
         isEUSeller
     };
 }
+
+
+// function to increment the China product counter and update the badge in the extension icon
+function incrementChinaCounter() {
+    chinaCounter++;
+    chrome.runtime.sendMessage({
+        action: "updateBadge",
+        count: chinaCounter
+    })
+}
