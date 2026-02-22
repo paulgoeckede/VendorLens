@@ -1,9 +1,3 @@
-# Systemdateien
-.DS_Store
-Thumbs.db
-
-# VS Code Einstellungen
-.vscode/
-
-# distribution
 dist/
+node_modules/
+releases/

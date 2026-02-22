@@ -1,0 +1,12 @@
+{
+  "name": "vendorlens",
+  "version": "1.0.2",
+  "description": "Amazon Merchant Region Detector",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10"
+  }
+}
