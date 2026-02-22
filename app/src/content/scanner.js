@@ -1,6 +1,5 @@
 let sellerCache = {}; // Cache for seller information to avoid redundant fetches
 let isCacheLoaded = false; // flag to indicate if the cache has been loaded from storage
-let chinaCounter = 0; // global counter for products from China displayed in the extension icon
 let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
 currentDomain = currentDomain.replace("www.", "");
 const activeConfig =
@@ -168,7 +167,7 @@ function startDeepScan(url, product) {
             merchantBox.querySelector(activeConfig.merchantLink) ||
             merchantBox.querySelector('a[href*="seller="]');
 
-          let sellerText = "";
+          let sellerText;
 
           if (linkElement) {
             sellerText = linkElement.textContent.trim().toLowerCase();

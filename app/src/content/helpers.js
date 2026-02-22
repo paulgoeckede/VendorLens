@@ -1,3 +1,5 @@
+let chinaCounter = 0; // global counter for products from China displayed in the extension icon
+
 /**
  * Function to extract a products ASIN from a given URL
  * @param {String} url The URL which the ASIN should be extracted from
