@@ -1,5 +1,3 @@
-// tests/chinaSeller.test.js
-
 const { chinaKeywords } = require('../app/src/content/i18n_config.js');
 
 global.chinaKeywords = chinaKeywords;
