@@ -49,3 +49,9 @@ const euPhoneCodes = [
     "+39", "+385", "+371", "+370", "+352", "+356", "+31", "+43", "+48",
     "+351", "+40", "+46", "+421", "+386", "+34", "+420", "+36", "+357"
 ];
+
+
+// conditional export for jest (ignored by browser)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { chinaKeywords, euKeywords, euPhoneCodes };
+}

@@ -1,7 +1,5 @@
-// tests/helpers.test.js
-
+// tests/asin.test.js
 const { extractAsinFromUrl } = require('../app/src/content/helpers.js');
-
 
 describe("ASIN Extraction (extractAsinFromUrl)", () => {
 

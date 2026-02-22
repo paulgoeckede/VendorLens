@@ -30,9 +30,48 @@ function extractAsinFromUrl(url) {
 }
 
 
+// function to check if seller is from china based on known keywords
+function isChinaSeller(text) {
+    if (!text) return false;
+
+    const lowerText = text.toLowerCase();
+
+    const hasKeyword = chinaKeywords.some(keyword => lowerText.includes(keyword));
+    if (hasKeyword) return true;
+
+    if (text.includes("+86")) return true; // China
+    if (text.includes("+852")) return true; // Hongkong
+
+
+    if (text.includes("CN")) return true;
+    if (text.includes("CHN")) return true;
+    if (text.includes("HK")) return true;
+
+    return false;
+}
+
+
+// function to check if seller is from EU based on known keywords
+function isEUSeller(text) {
+    if (!text) return false;
+
+    const lowerText = text.toLowerCase();
+
+    const hasCountryName = euKeywords.some(keyword => lowerText.includes(keyword));
+    if (hasCountryName) return true;
+
+    const hasPhoneCode = euPhoneCodes.some(code => text.includes(code));
+    if (hasPhoneCode) return true;
+
+    return false;
+}
+
+
 // conditional export for jest (ignored by browser)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        extractAsinFromUrl
+        extractAsinFromUrl,
+        isChinaSeller,
+        isEUSeller
     };
 }
