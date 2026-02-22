@@ -1,46 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../assets/css/popup.css">
-</head>
-<body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../../assets/css/popup.css" />
+  </head>
+  <body>
     <h1>VendorLens - Seller Info for Amazon</h1>
 
     <div class="card">
-        <div class="setting-row">
-            <span class="label">Scanner active</span>
-            <label class="switch">
-                <input type="checkbox" id="masterSwitch" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
+      <div class="setting-row">
+        <span class="label">Scanner active</span>
+        <label class="switch">
+          <input type="checkbox" id="masterSwitch" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
     <div class="card">
-        <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px; color: #333;">Actions</div>
+      <div
+        style="
+          font-size: 12px;
+          font-weight: bold;
+          margin-bottom: 8px;
+          color: #333;
+        "
+      >
+        Actions
+      </div>
 
-        <div class="setting-row">
-            <span class="label">Hide products from China</span>
-            <label class="switch">
-                <input type="checkbox" id="hideChina">
-                <span class="slider"></span>
-            </label>
-        </div>
+      <div class="setting-row">
+        <span class="label">Hide products from China</span>
+        <label class="switch">
+          <input type="checkbox" id="hideChina" />
+          <span class="slider"></span>
+        </label>
+      </div>
 
-        <div class="setting-row">
-            <span class="label">Mark EU Products</span>
-            <label class="switch">
-                <input type="checkbox" id="markEU" checked>
-                <span class="slider"></span>
-            </label>
-        </div>
+      <div class="setting-row">
+        <span class="label">Mark EU Products</span>
+        <label class="switch">
+          <input type="checkbox" id="markEU" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
     <div class="footer">Version __VERSION__</div>
 
     <script src="popup.js"></script>
-</body>
-
+  </body>
 </html>

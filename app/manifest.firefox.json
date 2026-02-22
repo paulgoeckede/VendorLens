@@ -1,67 +1,68 @@
 {
-    "name": "VendorLens - Seller Info for Amazon",
-    "description": "Reveal Amazon vendor origins. Filter out unwanted regions, display badges, and shop smarter. 100% local, no data tracking.",
-    "version": "1.0.1",
-    "manifest_version": 3,
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "vendorlens.app@gmail.com",
-            "data_collection_permissions": {
-                "required": ["none"],
-                "is_data_collection_allowed": false
-            }
-        }
-    },
-    "permissions": [
-        "storage"
-    ],
-    "host_permissions": [
+  "name": "VendorLens - Seller Info for Amazon",
+  "description": "Reveal Amazon vendor origins. Filter out unwanted regions, display badges, and shop smarter. 100% local, no data tracking.",
+  "version": "1.0.1",
+  "manifest_version": 3,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "vendorlens.app@gmail.com",
+      "data_collection_permissions": {
+        "required": ["none"],
+        "is_data_collection_allowed": false
+      }
+    }
+  },
+  "permissions": ["storage"],
+  "host_permissions": [
+    "*://*.amazon.de/*",
+    "*://*.amazon.com/*",
+    "*://*.amazon.co.uk/*",
+    "*://*.amazon.fr/*",
+    "*://*.amazon.it/*",
+    "*://*.amazon.es/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/hello.html",
+    "default_icon": "assets/icons/logo-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
         "*://*.amazon.de/*",
         "*://*.amazon.com/*",
         "*://*.amazon.co.uk/*",
         "*://*.amazon.fr/*",
         "*://*.amazon.it/*",
         "*://*.amazon.es/*"
-    ],
-    "action": {
-        "default_popup": "src/popup/hello.html",
-        "default_icon": "assets/icons/logo-128.png"
-    },
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*.amazon.de/*",
-                "*://*.amazon.com/*",
-                "*://*.amazon.co.uk/*",
-                "*://*.amazon.fr/*",
-                "*://*.amazon.it/*",
-                "*://*.amazon.es/*"
-        ],
-            "js": ["src/content/i18n_config.js", "src/content/badges.js", "src/content/helpers.js", "src/content/scanner.js"]
-        }
-    ],
-    "background": {
-        "scripts": [
-            "src/background/background.js"
-        ]
-    },
-    "icons": {
-        "16": "assets/icons/logo-16.png",
-        "32": "assets/icons/logo-32.png",
-        "48": "assets/icons/logo-48.png",
-        "128": "assets/icons/logo-128.png"
-    },
-    "web_accessible_resources": [
-        {
-            "resources": ["assets/icons/*"],
-            "matches": [
-                "*://*.amazon.de/*",
-                "*://*.amazon.com/*",
-                "*://*.amazon.co.uk/*",
-                "*://*.amazon.fr/*",
-                "*://*.amazon.it/*",
-                "*://*.amazon.es/*"
-            ]
-        }
-    ]
+      ],
+      "js": [
+        "src/content/i18n_config.js",
+        "src/content/badges.js",
+        "src/content/helpers.js",
+        "src/content/scanner.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": ["src/background/background.js"]
+  },
+  "icons": {
+    "16": "assets/icons/logo-16.png",
+    "32": "assets/icons/logo-32.png",
+    "48": "assets/icons/logo-48.png",
+    "128": "assets/icons/logo-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/icons/*"],
+      "matches": [
+        "*://*.amazon.de/*",
+        "*://*.amazon.com/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.es/*"
+      ]
+    }
+  ]
 }
