@@ -66,6 +66,8 @@ const observer = new IntersectionObserver((entries, obs) => {
 
 // regularly scan the page for new product elements and observe them with the IntersectionObserver, but only after the cache has been loaded to ensure we have seller information available when products come into view
 function startScannerLoop() {
+    if (!config.masterSwitch) return; // do not scan any products if master switch is switched off
+
     setInterval(() => {
         if (!isCacheLoaded) return;
         const products = document.querySelectorAll(activeConfig.productContainer);
