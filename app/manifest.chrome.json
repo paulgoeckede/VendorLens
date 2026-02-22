@@ -28,7 +28,7 @@
                 "*://*.amazon.it/*",
                 "*://*.amazon.es/*"
         ],
-            "js": ["src/content/i18n_config.js", "src/content/helpers.js", "src/content/scanner.js"]
+            "js": ["src/content/i18n_config.js", "src/content/badges.js", "src/content/helpers.js", "src/content/scanner.js"]
         }
     ],
     "background": {
