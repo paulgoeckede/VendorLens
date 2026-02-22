@@ -128,7 +128,7 @@ function createBadgeElement(parent, text, color, textcolor, iconFileName, seller
     }
 
     const textSpan = document.createElement("span");
-    textSpan.innerText = text;
+    textSpan.textContent = text;
     badge.appendChild(textSpan);
 
     parent.appendChild(badge);
