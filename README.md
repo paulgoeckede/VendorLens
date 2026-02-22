@@ -31,12 +31,14 @@ Um an der Extension zu arbeiten oder die fertigen Dateien für den Browser zu ge
 3. Führe das Build-Skript im Hauptverzeichnis aus:
 
     ```bash
-    node build.js
+    npm run build
     ```
 
-Das Skript erstellt automatisch einen neuen `dist/`-Ordner, der von Git ignoriert wird, mit zwei Unterordnern:
-* `dist/chrome/` (Fertig für den Chrome Web Store)
-* `dist/firefox/` (Fertig für Mozilla Add-ons)
+**Ablauf des Build-Prozesses:**
+1. Die Verzeichnisse dist/ und releases/ werden bereinigt.
+2. Die Quelldateien aus dem Ordner app/ werden für Chrome und Firefox getrennt aufbereitet.
+3. Die Versionsnummer aus der package.json wird automatisch in die Manifest-Dateien und in die HTML-Datei unter app/src/popup/hello.html geschrieben.
+4. Fertige Archiv-Dateien (.zip) inklusive Versionsnummer im Namen werden im Ordner releases/ erstellt.
 
 ## Lokales Testen
 
@@ -49,3 +51,19 @@ Das Skript erstellt automatisch einen neuen `dist/`-Ordner, der von Git ignorier
 1. Navigiere zu `about:debugging`
 2. Klicke links auf "Dieser Firefox".
 3. Klicke auf "Temporäres Add-on laden..." und wähle die `manifest.json` aus dem Ordner `dist/firefox` aus.
+
+## Projektstruktur
+
+| Verzeichnis / Datei | Beschreibung |
+| :--- | :--- |
+| app/ | Quellcode der Erweiterung (HTML, JS, CSS, Icons). |
+| dist/ | Vom Build-Skript generierte, lauffähige Browser-Ordner. |
+| releases/ | Automatisch generierte Zip-Archive für den Store-Upload. |
+| build.js | Das Automatisierungsskript für Build und Packaging. |
+| package.json | Zentrale Projektkonfiguration, Versionierung und Abhängigkeiten. |
+
+
+## Lizenz
+
+Alle Rechte Vorbehalten
+Die Nutzung, Vervielfältigung oder Verbreitung des Codes ist ohne ausdrückliche Genehmigung des Urhebers nicht gestattet.
