@@ -1,11 +1,15 @@
 {
     "name": "VendorLens - Seller Info for Amazon",
     "description": "Reveal Amazon vendor origins. Filter out unwanted regions, display badges, and shop smarter. 100% local, no data tracking.",
-    "version": "1.0",
+    "version": "1.0.1",
     "manifest_version": 3,
     "browser_specific_settings": {
         "gecko": {
-            "id": "vendorlens.app@gmail.com"
+            "id": "vendorlens.app@gmail.com",
+            "data_collection_permissions": {
+                "required": ["none"],
+                "is_data_collection_allowed": false
+            }
         }
     },
     "permissions": [
