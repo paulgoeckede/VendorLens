@@ -115,7 +115,7 @@ function createBadgeElement(
     padding: 4px 12px 4px 8px;
     position: absolute;
     ${positionStyles}
-    z-index: 1000; 
+    z-index: 5; 
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 600; 
     font-size: 11px; 
