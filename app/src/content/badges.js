@@ -40,21 +40,21 @@ function applyBadge(product, data) {
     createBadgeElement(
       product,
       "Chinese Seller",
-      "#d00",
+      "#BC2C1A",
       "white",
       "logo-128.png",
       data.sellerUrl,
     );
     incrementChinaCounter();
   } else if (data.name === "Amazon") {
-    createBadgeElement(product, "Amazon", "#2196F3", "white", "logo-128.png");
+    createBadgeElement(product, "Amazon", "#169AEC", "white", "logo-128.png");
 
     return;
   } else if (data.isEU && config.markEU) {
     createBadgeElement(
       product,
       "EU Seller",
-      "#388e3c",
+      "#169AEC",
       "white",
       "logo-128.png",
       data.sellerUrl,
@@ -93,25 +93,41 @@ function createBadgeElement(
   const badge = document.createElement("div");
   badge.className = "custom-badge";
 
+  let positionStyles = `
+    bottom: 10px; 
+    left: 5px; 
+  `;
+
+  if (
+    parent.matches('div[id^="anonCarousel"] li') ||
+    parent.closest('div[id^="anonCarousel"] li')
+  ) {
+    positionStyles = `
+      top: 0px; 
+      left: 5px; 
+  `;
+  }
+
   badge.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 6px; /* Abstand zwischen Icon und Text */
-        position: absolute; 
-        bottom: 10px; 
-        left: 0; 
-        padding: 4px 8px; 
-        z-index: 1000; 
-        font-weight: bold; 
-        font-family: sans-serif; 
-        font-size: 11px; 
-        border-bottom-right-radius: 4px;
-        border-radius: 5px; 
-        drop-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
-        pointer-events: none; 
-        background-color: ${color}; 
-        color: ${textcolor};
-    `;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; 
+    padding: 4px 12px 4px 8px;
+    position: absolute;
+    ${positionStyles}
+    z-index: 1000; 
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600; 
+    font-size: 11px; 
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
+    border-radius: 5px;
+    pointer-events: none; 
+    background-color: ${color}; 
+    color: ${textcolor};
+  `;
 
   if (iconFileName) {
     const icon = document.createElement("img");
