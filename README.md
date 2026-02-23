@@ -45,16 +45,33 @@ To work on the extension or generate the final files for the browser, you need N
 
 ## Automated Tests
 
-The project features an isolated test architecture to secure the core logic and DOM manipulations without having to start a browser.
+The project features a comprehensive test architecture covering both isolated unit logic and real-world browser interactions.
 
-Run all tests with the following command:
+### Unit and DOM Tests
 
-    ```bash
-    npm run test
-    ```
+These tests secure the core logic and DOM manipulations without having to start a browser.
+
+Run all isolated tests with the following command:
+
+```bash
+npm run test
+```
 
 - **Logic Tests:** Verify pure data functions (e.g., ASIN extraction, origin analysis).
 - **DOM Tests:** Use JSDOM to verify the creation and manipulation of HTML elements (badges, hiding products).
+
+### End-to-End (E2E) Tests
+
+The project uses Playwright to run fully automated browser tests. These tests load the extension into a real Chromium browser and simulate human scrolling to verify the entire lifecycle across different Amazon marketplaces, including background worker communication, UI updates, and session caching.
+
+Run the E2E tests with the following command:
+
+```bash
+npm run test:e2e
+```
+
+- **Execution:** Runs visibly in headed mode for direct observation.
+- **Reporting:** Automatically generates an HTML report for straightforward debugging of the DOM state and test steps.
 
 ## Local Testing in Browser
 

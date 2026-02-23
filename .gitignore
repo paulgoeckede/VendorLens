@@ -6,3 +6,4 @@ test-profile/
 test-results/
 e2e/test-profiles
 playwright.config.js
+playwright-report/
