@@ -36,7 +36,8 @@ chrome.runtime.onMessage.addListener((request) => {
 
     if (
       request.settings.hideChina !== undefined ||
-      request.settings.masterSwitch !== undefined
+      request.settings.masterSwitch !== undefined ||
+      request.settings.markEU !== undefined
     ) {
       location.reload();
     }
