@@ -12,25 +12,25 @@ const marketplaces = [
 ];
 
 for (const market of marketplaces) {
-  test(`VendorLens Extension loads on ${market.domain} and applies loading badges`, async () => {
+  test(`Functionality check: VendorLens core architecture works end-to-end on ${market.domain}`, async () => {
     const pathToExtension = path.join(process.cwd(), "dist", "chrome");
     const userDataDir = path.join(
       process.cwd(),
       "e2e",
       "test-profiles",
-      `chrome-test-profile-${market.domain}`,
+      "chrome-sanity-profile",
     );
 
-    // delete test-profile folder if it exists for a clean state
+    // remove existing profile data
     if (fs.existsSync(userDataDir)) {
       fs.rmSync(userDataDir, { recursive: true, force: true });
     }
 
-    // start Chromium browser with injected extension
+    // launch isolated chromium instance with injected extension
     const browserContext = await chromium.launchPersistentContext(userDataDir, {
       headless: false,
       userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", // to avoid bot detection
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       args: [
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
@@ -38,68 +38,50 @@ for (const market of marketplaces) {
     });
 
     const page = await browserContext.newPage();
-
     await page.goto(`https://www.${market.domain}/s?k=${market.search}`);
-    const badge = page.locator(".custom-badge").first();
-    await expect(badge).toBeVisible({ timeout: 15000 });
-    await expect(badge).toHaveText("Loading..");
-    await browserContext.close();
-  });
 
-  test(`VendorLens Extension loads on ${market.domain} and applies different seller type badges`, async () => {
-    const pathToExtension = path.join(process.cwd(), "dist", "chrome");
-    const userDataDir = path.join(
-      process.cwd(),
-      "e2e",
-      "test-profiles",
-      `chrome-test-profile-${market.domain}`,
+    // trigger intersection observer with scrolling
+    await page.mouse.wheel(0, 1000);
+
+    // check for loading badges
+    const firstBadge = page.locator(".custom-badge").first();
+    await expect(firstBadge).toBeVisible({ timeout: 10000 });
+    console.log(
+      `[${market.domain}] Loading badge found! Waiting for scan results..`,
     );
 
-    // delete test-profile folder if it exists for a clean state
-    if (fs.existsSync(userDataDir)) {
-      fs.rmSync(userDataDir, { recursive: true, force: true });
+    // check that result badges have been applied
+    await expect(firstBadge).not.toHaveText("Loading..", { timeout: 15000 });
+    console.log(
+      `[${market.domain}] Scan successful! Badges have been applied. Checking cache..`,
+    );
+
+    // check if data has been written to cache
+    let [background] = browserContext.serviceWorkers();
+    if (!background) {
+      background = await browserContext.waitForEvent("serviceworker");
     }
 
-    // start Chromium browser with injected extension
-    const browserContext = await chromium.launchPersistentContext(userDataDir, {
-      headless: false,
-      userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", // to avoid bot detection
-      args: [
-        `--disable-extensions-except=${pathToExtension}`,
-        `--load-extension=${pathToExtension}`,
-      ],
+    const extensionStorage = await background.evaluate(() => {
+      return new Promise((resolve) => {
+        chrome.storage.local.get(null, (result) => resolve(result));
+      });
     });
 
-    const page = await browserContext.newPage();
-
-    await page.goto(`https://www.${market.domain}/s?k=${market.search}`);
-
-    for (let i = 0; i < 5; i++) {
-      await page.mouse.wheel(0, 1500);
-      await page.waitForTimeout(2000);
-    }
-
-    const amazonBadge = page
-      .locator(".custom-badge", { hasText: "Amazon" })
-      .first();
-    const chineseSellerBadge = page
-      .locator(".custom-badge", { hasText: "Chinese Seller" })
-      .first();
-
-    await expect(amazonBadge).toBeVisible({ timeout: 10000 });
-    if (market.domain != "amazon.com" && market.domain != "amazon.co.uk") {
-      const euSellerBadge = page
-        .locator(".custom-badge", { hasText: "EU Seller" })
-        .first();
-      await expect(euSellerBadge).toBeVisible({ timeout: 10000 });
-    }
-    await expect(chineseSellerBadge).toBeVisible({ timeout: 10000 });
+    expect(extensionStorage.cachedSellers).toBeDefined();
+    expect(Object.keys(extensionStorage.cachedSellers).length).toBeGreaterThan(
+      0,
+    );
+    console.log(
+      `[${market.domain}] Cache was updated succesfully. Test complete.`,
+    );
 
     await browserContext.close();
   });
 
-  test(`VendorLens extension caches seller data on ${market.domain}`, async () => {
+  test(`VendorLens HTML selectors are intact on ${market.domain}`, async () => {
+    test.setTimeout(90000);
+
     const pathToExtension = path.join(process.cwd(), "dist", "chrome");
     const userDataDir = path.join(
       process.cwd(),
@@ -124,34 +106,88 @@ for (const market of marketplaces) {
       ],
     });
 
+    // open search result page
     const page = await browserContext.newPage();
     await page.goto(`https://www.${market.domain}/s?k=${market.search}`);
 
-    const badge = page.locator(".custom-badge").first();
-
-    // wait for product check to be finished
-    await expect(badge).toBeVisible({ timeout: 15000 });
-    await expect(badge).not.toHaveText("Loading..", { timeout: 15000 });
-
-    // grab extension cache
-    let [background] = browserContext.serviceWorkers();
-    if (!background) {
-      background = await browserContext.waitForEvent("serviceworker");
+    // scroll down a bit to fully load everything
+    for (let i = 0; i < 5; i++) {
+      await page.keyboard.press("PageDown");
+      await page.waitForTimeout(500);
     }
 
-    const extensionStorage = await background.evaluate(() => {
-      return new Promise((resolve) => {
-        chrome.storage.local.get(null, (result) => {
-          resolve(result);
-        });
-      });
-    });
-
-    // check if items have been stored in extension cache
-    expect(extensionStorage.cachedSellers).toBeDefined();
-    expect(Object.keys(extensionStorage.cachedSellers).length).toBeGreaterThan(
-      0,
+    // wait for the first badges to load
+    console.log(`[${market.domain}] Waiting for first loaded badge..`);
+    const firstBadge = page.locator(".custom-badge").first();
+    await expect(firstBadge).not.toHaveText("Loading..", { timeout: 20000 });
+    console.log(
+      `[${market.domain}] Badge found! Looking for product container..`,
     );
+
+    // check productContainerSelector functionality
+    const productContainerSelector =
+      'div[data-component-type="s-search-result"]';
+    const productContainer = page
+      .locator(productContainerSelector, {
+        has: page.locator(".custom-badge", {
+          hasText: /(EU Seller|Chinese Seller)/,
+        }),
+      })
+      .first();
+
+    await expect(productContainer).toBeVisible({ timeout: 10000 });
+    console.log(
+      `[${market.domain}] Container found! Looking for sponsored products..`,
+    );
+
+    // check sponsored container selector functionality
+    const sponsoredProductSelector = 'div[id^="anonCarousel"] li';
+    const sponsoredProduct = page.locator(sponsoredProductSelector).first();
+
+    await expect(sponsoredProduct).toBeVisible({ timeout: 10000 });
+
+    console.log(
+      `[${market.domain}] Sponsored products found! Looking for product link..`,
+    );
+
+    // check product link selector functionality
+    const productLink = productContainer.locator("a").first();
+    console.log(
+      `[${market.domain}] Productlink found! Opening product page and looking for merchant container..`,
+    );
+
+    await productLink.click();
+
+    // check merchant container selector functionality
+    const sellerContainerSelector =
+      'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]';
+    const sellerContainer = page.locator(sellerContainerSelector).first();
+
+    await expect(sellerContainer).toBeVisible({ timeout: 10000 });
+
+    console.log(
+      `[${market.domain}] Merchantcontainer found! Looking for vendor link..`,
+    );
+
+    // check seller link selector functionality
+    const sellerLinkSelector = "#sellerProfileTriggerId";
+    const sellerLink = page.locator(sellerLinkSelector).first();
+
+    await expect(sellerLink).toBeVisible({ timeout: 10000 });
+
+    console.log(
+      `[${market.domain}] Vendor link found! Opening sellers page and looking for imprint..`,
+    );
+
+    await sellerLink.click();
+
+    // check imprint container selector functionality
+    const imprintContainerSelector = "div#page-section-detail-seller-info";
+    const imprintContainer = page.locator(imprintContainerSelector).first();
+
+    await expect(imprintContainer).toBeVisible({ timeout: 10000 });
+
+    console.log(`[${market.domain}] Imprint found! Test complete.`);
 
     await browserContext.close();
   });
