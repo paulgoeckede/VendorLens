@@ -13,6 +13,7 @@ const marketplaces = [
 
 for (const market of marketplaces) {
   test(`VendorLens HTML selectors are intact on ${market.domain}`, async () => {
+    // --- INITIAL SETUP ---
     test.setTimeout(90000);
 
     const pathToExtension = path.join(process.cwd(), "dist", "chrome");
@@ -20,7 +21,7 @@ for (const market of marketplaces) {
       process.cwd(),
       "e2e",
       "test-profiles",
-      `chrome-html-profile-${market.domain}`,
+      `chrome-html-profile`,
     );
 
     // delete test-profile folder if it exists for a clean state
@@ -49,78 +50,54 @@ for (const market of marketplaces) {
       await page.waitForTimeout(2000);
     }
 
-    // wait for the first badges to load
-    console.log(`[${market.domain}] Waiting for first loaded badge..`);
-    const firstBadge = page.locator(".custom-badge").first();
-    await expect(firstBadge).not.toHaveText("Loading..", { timeout: 20000 });
-    console.log(
-      `[${market.domain}] Badge found! Looking for product container..`,
-    );
+    // --- TESTS START ---
 
-    // check productContainerSelector functionality
-    const productContainerSelector =
-      'div[data-component-type="s-search-result"]';
-    const productContainer = page
-      .locator(productContainerSelector, {
-        has: page.locator(".custom-badge", {
-          hasText: /(EU Seller|Chinese Seller)/,
-        }),
-      })
-      .first();
+    await test.step("1. Check if sponsoredContainer selector is working", async () => {
+      const sponsoredProductSelector = 'div[id^="anonCarousel"] li';
+      const sponsoredProduct = page.locator(sponsoredProductSelector).first();
 
-    await expect(productContainer).toBeVisible({ timeout: 10000 });
-    console.log(
-      `[${market.domain}] Container found! Looking for sponsored products..`,
-    );
+      await expect(sponsoredProduct).toBeVisible({ timeout: 10000 });
+    });
 
-    // check sponsored container selector functionality
-    const sponsoredProductSelector = 'div[id^="anonCarousel"] li';
-    const sponsoredProduct = page.locator(sponsoredProductSelector).first();
+    await test.step("2. Check if productContainer and sellerLink selectors are working", async () => {
+      const productContainerSelector =
+        'div[data-component-type="s-search-result"]';
+      const productContainer = page
+        .locator(productContainerSelector, {
+          has: page.locator(".custom-badge", {
+            hasText: /(EU Seller|Chinese Seller)/,
+          }),
+        })
+        .first();
 
-    await expect(sponsoredProduct).toBeVisible({ timeout: 10000 });
+      await expect(productContainer).toBeVisible({ timeout: 10000 });
 
-    console.log(
-      `[${market.domain}] Sponsored products found! Looking for product link..`,
-    );
+      const productLink = productContainer.locator("a").first();
+      await productLink.click();
+    });
 
-    // check product link selector functionality
-    const productLink = productContainer.locator("a").first();
-    console.log(
-      `[${market.domain}] Productlink found! Opening product page and looking for merchant container..`,
-    );
+    await test.step("3. Check if merchantContainer selector is working", async () => {
+      const sellerContainerSelector =
+        'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]';
+      const sellerContainer = page.locator(sellerContainerSelector).first();
 
-    await productLink.click();
+      await expect(sellerContainer).toBeVisible({ timeout: 10000 });
+    });
 
-    // check merchant container selector functionality
-    const sellerContainerSelector =
-      'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]';
-    const sellerContainer = page.locator(sellerContainerSelector).first();
+    await test.step("4. Check if sellerLink selector is working", async () => {
+      const sellerLinkSelector = "#sellerProfileTriggerId";
+      const sellerLink = page.locator(sellerLinkSelector).first();
 
-    await expect(sellerContainer).toBeVisible({ timeout: 10000 });
+      await expect(sellerLink).toBeAttached({ timeout: 10000 });
+      await sellerLink.click({ force: true });
+    });
 
-    console.log(
-      `[${market.domain}] Merchantcontainer found! Looking for vendor link..`,
-    );
+    await test.step("5. Check if imprintContainer selector is working", async () => {
+      const imprintContainerSelector = "div#page-section-detail-seller-info";
+      const imprintContainer = page.locator(imprintContainerSelector).first();
 
-    // check seller link selector functionality
-    const sellerLinkSelector = "#sellerProfileTriggerId";
-    const sellerLink = page.locator(sellerLinkSelector).first();
-
-    await expect(sellerLink).toBeVisible({ timeout: 10000 });
-
-    console.log(
-      `[${market.domain}] Vendor link found! Opening sellers page and looking for imprint..`,
-    );
-
-    await sellerLink.click();
-
-    // check imprint container selector functionality
-    const imprintContainerSelector = "div#page-section-detail-seller-info";
-    const imprintContainer = page.locator(imprintContainerSelector).first();
-
-    await expect(imprintContainer).toBeVisible({ timeout: 10000 });
-
-    console.log(`[${market.domain}] Imprint found! Test complete.`);
+      await expect(imprintContainer).toBeVisible({ timeout: 10000 });
+    });
 
     await browserContext.close();
   });

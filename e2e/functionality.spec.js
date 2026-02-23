@@ -13,6 +13,7 @@ const marketplaces = [
 
 for (const market of marketplaces) {
   test(`Functionality check: VendorLens core architecture works end-to-end on ${market.domain}`, async () => {
+    // --- INITIAL SETUP ---
     const pathToExtension = path.join(process.cwd(), "dist", "chrome");
     const userDataDir = path.join(
       process.cwd(),
@@ -40,115 +41,113 @@ for (const market of marketplaces) {
     const page = await browserContext.newPage();
     await page.goto(`https://www.${market.domain}/s?k=${market.search}`);
 
-    // check for loading badges
-    const firstBadge = page.locator(".custom-badge").first();
-    await expect(firstBadge).toBeVisible({ timeout: 10000 });
-    console.log(
-      `[${market.domain}] Loading badge found! Waiting for scan results..`,
-    );
-
     // trigger intersection observer with scrolling
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press("PageDown");
       await page.waitForTimeout(2000);
     }
 
-    // check that result badges have been applied
-    await expect(firstBadge).not.toHaveText("Loading..", { timeout: 15000 });
-    console.log(
-      `[${market.domain}] Scan successful! Badges have been applied. Checking session cache..`,
-    );
+    const firstBadge = page.locator(".custom-badge").first();
 
-    // testing session cache
-    const sessionData = await page.evaluate(() => {
-      const cacheExcerpts = {};
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && key.startsWith("asin_cache_")) {
-          cacheExcerpts[key] = sessionStorage.getItem(key);
-        }
-      }
-      return cacheExcerpts;
+    // --- TESTS START ---
+
+    await test.step("1. Check for loading badges", async () => {
+      await expect(firstBadge).toBeVisible({ timeout: 10000 });
     });
 
-    const cachedAsins = Object.keys(sessionData);
-    console.log(
-      `[${market.domain}] ${cachedAsins.length} ASINs found in session cache. Checking functionality..`,
-    );
+    await test.step("2. Check that result badges have been applied properly", async () => {
+      await expect(firstBadge).not.toHaveText("Loading..", { timeout: 15000 });
+    });
 
-    expect(cachedAsins.length).toBeGreaterThan(0);
+    await test.step("3. Check that ASIN data gets stored to session cache and scan is bypassed if ASIN data is available", async () => {
+      const sessionData = await page.evaluate(() => {
+        const cacheExcerpts = {};
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          if (key && key.startsWith("asin_cache_")) {
+            cacheExcerpts[key] = sessionStorage.getItem(key);
+          }
+        }
+        return cacheExcerpts;
+      });
 
-    // check if cached data is valid JSON
-    const sampleData = JSON.parse(sessionData[cachedAsins[0]]);
-    expect(sampleData).toBeDefined();
+      const cachedAsins = Object.keys(sessionData);
+      expect(cachedAsins.length).toBeGreaterThan(0);
 
-    const testAsin = cachedAsins[0].replace("asin_cache_", "");
+      const sampleData = JSON.parse(sessionData[cachedAsins[0]]);
+      expect(sampleData).toBeDefined();
 
-    const productWithGuaranteedBadge = page
-      .locator('div[data-component-type="s-search-result"]', {
-        has: page.locator(".custom-badge", { hasNotText: "Loading.." }),
-      })
-      .first();
-
-    const targetAsin =
-      await productWithGuaranteedBadge.getAttribute("data-asin");
-
-    await page.reload();
-
-    const specificProductCard = page
-      .locator(
-        `div[data-component-type="s-search-result"][data-asin="${targetAsin}"]`,
-      )
-      .first();
-    await specificProductCard
-      .waitFor({ state: "visible", timeout: 10000 })
-      .catch(() => null);
-
-    console.log(
-      `[${market.domain}] Cached ASIN ${testAsin} found. Checking badge...`,
-    );
-
-    if (await specificProductCard.isVisible()) {
-      // scroll jiggle to trigger observer
-      await specificProductCard.scrollIntoViewIfNeeded();
-      await page.mouse.wheel(0, 100);
-      await page.waitForTimeout(1500);
-
-      const specificBadge = specificProductCard
-        .locator(".custom-badge")
+      const productWithGuaranteedBadge = page
+        .locator('div[data-component-type="s-search-result"]', {
+          has: page.locator(".custom-badge", { hasNotText: "Loading.." }),
+        })
         .first();
 
-      await expect(specificBadge).toBeVisible({ timeout: 5000 });
-      await expect(specificBadge).not.toHaveText("Loading..", {
-        timeout: 5000,
+      await productWithGuaranteedBadge.waitFor({
+        state: "visible",
+        timeout: 15000,
       });
-      console.log(
-        `[${market.domain}] Sessioncache-Test for ASIN ${targetAsin} succesful.`,
-      );
-    } else {
-      console.log(
-        `[${market.domain}] ASIN ${targetAsin} gone after reload (Layout-Shift).`,
-      );
-    }
 
-    // check if data has been written to cache
-    let [background] = browserContext.serviceWorkers();
-    if (!background) {
-      background = await browserContext.waitForEvent("serviceworker");
-    }
+      let targetAsin =
+        await productWithGuaranteedBadge.getAttribute("data-asin");
 
-    const extensionStorage = await background.evaluate(() => {
-      return new Promise((resolve) => {
-        chrome.storage.local.get(null, (result) => resolve(result));
-      });
+      if (!targetAsin) {
+        console.log("Wasn't able to extract an ASIN for the reload.");
+        return;
+      }
+      targetAsin = targetAsin.trim();
+
+      await page.reload();
+
+      const specificProductCard = page
+        .locator(
+          `div[data-component-type="s-search-result"][data-asin="${targetAsin}"]`,
+        )
+        .first();
+
+      await specificProductCard
+        .waitFor({ state: "visible", timeout: 10000 })
+        .catch(() => null);
+
+      if (await specificProductCard.isVisible()) {
+        await specificProductCard.scrollIntoViewIfNeeded();
+        await page.mouse.wheel(0, 100);
+        await page.waitForTimeout(1500);
+
+        const specificBadge = specificProductCard
+          .locator(".custom-badge")
+          .first();
+
+        await expect(specificBadge).toBeVisible({ timeout: 5000 });
+        await expect(specificBadge).not.toHaveText("Loading..", {
+          timeout: 5000,
+        });
+      } else {
+        console.log(
+          `ASIN ${targetAsin} was lost during reload. Skipping check`,
+        );
+      }
     });
 
-    expect(extensionStorage.cachedSellers).toBeDefined();
-    expect(Object.keys(extensionStorage.cachedSellers).length).toBeGreaterThan(
-      0,
-    );
-    console.log(`[${market.domain}] Local storage working. Test complete.`);
+    await test.step("4. Check that seller data is being written into local storage", async () => {
+      // check if data has been written to cache
+      let [background] = browserContext.serviceWorkers();
+      if (!background) {
+        background = await browserContext.waitForEvent("serviceworker");
+      }
 
-    await browserContext.close();
+      const extensionStorage = await background.evaluate(() => {
+        return new Promise((resolve) => {
+          chrome.storage.local.get(null, (result) => resolve(result));
+        });
+      });
+
+      expect(extensionStorage.cachedSellers).toBeDefined();
+      expect(
+        Object.keys(extensionStorage.cachedSellers).length,
+      ).toBeGreaterThan(0);
+
+      await browserContext.close();
+    });
   });
 }
