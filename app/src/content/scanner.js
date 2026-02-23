@@ -207,7 +207,11 @@ function startDeepScan(url, product) {
           applyBadge(product, cachedData);
 
           // save asin info to session cache
-          const foundAsin = extractAsinFromUrl(sellerUrl);
+          const asinContainer = product.closest("[data-asin]");
+          const foundAsin = asinContainer
+            ? asinContainer.getAttribute("data-asin")
+            : extractAsinFromUrl(sellerUrl);
+
           if (foundAsin) {
             sessionStorage.setItem(
               "asin_cache_" + foundAsin,
@@ -231,8 +235,8 @@ function startDeepScan(url, product) {
           // store and cache the results, apply badge, and return early since we don't need to fetch a seller profile for Amazon itself
           sellerCache["Amazon"] = resultData;
           chrome.storage.local.set({ cachedSellers: sellerCache });
-          applyBadge(product, resultData);
 
+          applyBadge(product, resultData);
           // save asin info to session cache
           const foundAsin = product.getAttribute("data-asin");
           if (foundAsin) {
