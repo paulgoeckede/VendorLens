@@ -234,7 +234,7 @@ function startDeepScan(url, product) {
           applyBadge(product, resultData);
 
           // save asin info to session cache
-          const foundAsin = extractAsinFromUrl(sellerUrl);
+          const foundAsin = product.getAttribute("data-asin");
           if (foundAsin) {
             sessionStorage.setItem(
               "asin_cache_" + foundAsin,
