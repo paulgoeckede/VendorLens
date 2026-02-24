@@ -10,7 +10,6 @@ const activeConfig =
 let config = {
   masterSwitch: true,
   hideChina: false,
-  markEU: true,
 };
 
 /** LOAD SETTINGS AND CACHE */
@@ -38,8 +37,7 @@ chrome.runtime.onMessage.addListener((request) => {
 
     if (
       request.settings.hideChina !== undefined ||
-      request.settings.masterSwitch !== undefined ||
-      request.settings.markEU !== undefined
+      request.settings.masterSwitch !== undefined
     ) {
       location.reload();
     }

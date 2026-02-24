@@ -44,7 +44,7 @@ function applyBadge(product, data) {
       "logo-128.png",
       null,
     );
-  } else if (data.isEU && config.markEU) {
+  } else if (data.isEU) {
     // eu badge
     createBadgeElement(
       product,

@@ -2,12 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaults = {
     masterSwitch: true,
     hideChina: false,
-    markEU: true,
   };
 
   chrome.storage.sync.get(defaults, (items) => {
     document.getElementById("hideChina").checked = items.hideChina;
-    document.getElementById("markEU").checked = items.markEU;
     document.getElementById("masterSwitch").checked = items.masterSwitch;
   });
 
@@ -17,10 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("hideChina").addEventListener("change", (e) => {
     updateSetting("hideChina", e.target.checked);
-  });
-
-  document.getElementById("markEU").addEventListener("change", (e) => {
-    updateSetting("markEU", e.target.checked);
   });
 });
 
