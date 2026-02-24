@@ -88,97 +88,127 @@ function createBadgeElement(
   // remove old badge if there is one
   removeBadge(parent);
 
-  parent.style.position = "relative";
+  // make sure container is ready for absolute positioning
+  if (window.getComputedStyle(parent).position === "static") {
+    parent.style.position = "relative";
+  }
 
   const badge = document.createElement("div");
   badge.className = "custom-badge";
 
+  badge.style.backgroundColor = color;
+  badge.style.color = textcolor;
+
   if (iconFileName) {
     const icon = document.createElement("img");
     icon.src = chrome.runtime.getURL("assets/icons/" + iconFileName);
-    icon.style.width = "18px";
-    icon.style.height = "18px";
-    icon.style.display = "block";
+    icon.className = "badge-icon";
     badge.appendChild(icon);
   }
 
-  // apply seller imprint link and hover effects to badges in case of third party seller
+  const textSpan = document.createElement("span");
+  textSpan.textContent = text;
+  textSpan.className = "badge-text"; // starts hidden with width = 0
+  badge.appendChild(textSpan);
+
   if (sellerUrl) {
-    badge.style.cursor = "pointer";
-
-    badge.style.pointerEvents = "auto";
-    badge.style.transition = "all 0.2s ease-in-out";
-
-    badge.addEventListener("mouseenter", () => {
-      badge.style.transform = "scale(1.05)";
-      badge.style.filter = "drop-shadow(0px 4px 4px rgba(0,0,0,0.3))";
-    });
-
-    badge.addEventListener("mouseleave", () => {
-      badge.style.transform = "scale(1)";
-      badge.style.filter = "drop-shadow: 1px 1px 3px rgba(0,0,0,0.2)";
-    });
+    badge.classList.add("is-clickable"); // activates css hover effect
 
     badge.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       window.open(sellerUrl, "_blank");
     });
+  } else {
+    badge.style.pointerEvents = "none";
   }
 
-  const textSpan = document.createElement("span");
-  textSpan.textContent = text;
-  badge.appendChild(textSpan);
-
+  // positioning: inline or absolute as fallback
   const titleElement = parent.querySelector("h2");
 
   if (titleElement) {
-    badge.style.cssText = `
-    display: inline-flex;
-    align-items: center;
-    gap: 6px; 
-    padding: 2px 6px;
-    margin-right: 8px; /* Abstand zwischen Badge und dem eigentlichen Produkttitel */
-    margin-bottom: 2px;
-    vertical-align: middle; /* Sorgt dafür, dass die Badge auf einer Linie mit dem Text bleibt */
-    border-radius: 4px; 
-    font-family: system-ui, -apple-system, sans-serif;
-    font-weight: 600; 
-    font-size: 11px; 
-    letter-spacing: 0.03em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: ${color}; 
-    color: ${textcolor};
-    /* Kein position: absolute und kein z-index mehr nötig! */
-  `;
-
+    badge.classList.add("badge-inline");
     titleElement.prepend(badge);
   } else {
-    badge.style.cssText = `
-    display: inline-flex;
-    align-items: center;
-    gap: 8px; 
-    padding: 4px 12px 4px 8px;
-    position: absolute;
-    top: 0px;
-    right: 5px;
-    z-index: 5; 
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 600; 
-    font-size: 11px; 
-    letter-spacing: 0.03em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
-    border-radius: 5px;
-    pointer-events: none; 
-    background-color: ${color}; 
-    color: ${textcolor};
-  `;
-
+    badge.classList.add("badge-absolute");
     parent.appendChild(badge);
   }
+}
+
+/**
+ * Function to add badge styling to HTML
+ */
+function injectBadgeStyles() {
+  if (document.getElementById("amz-badge-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "amz-badge-styles";
+  style.textContent = `
+    .custom-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px; 
+      font-family: system-ui, -apple-system, sans-serif;
+      font-weight: 600; 
+      font-size: 11px; 
+      letter-spacing: 0.03em;
+      -webkit-font-smoothing: antialiased;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
+      height: 22px; /* Fixe Höhe, damit beim Hovern nichts springt */
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .custom-badge.is-clickable {
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .custom-badge.is-clickable:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));
+    }
+
+    /* Das Icon */
+    .custom-badge .badge-icon {
+      width: 18px;
+      height: 18px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .custom-badge .badge-text {
+      max-width: 0;
+      opacity: 0;
+      white-space: nowrap;
+      margin-left: 0;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .custom-badge:hover .badge-text {
+      max-width: 120px; /* Breite für den Text */
+      opacity: 1;
+      margin-left: 6px;
+      padding-right: 8px; /* Etwas Platz rechts */
+    }
+
+    .badge-inline {
+      padding: 2px;
+      margin-right: 8px;
+      margin-bottom: 2px;
+      vertical-align: middle;
+    }
+
+    .badge-absolute {
+      padding: 2px;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      z-index: 5; 
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 /**

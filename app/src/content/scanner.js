@@ -1,3 +1,5 @@
+injectBadgeStyles();
+
 let sellerCache = {}; // Cache for seller information to avoid redundant fetches
 let isCacheLoaded = false; // flag to indicate if the cache has been loaded from storage
 let currentDomain = window.location.hostname; // get TLD in form of www.amazon.**
