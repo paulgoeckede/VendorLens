@@ -28,10 +28,10 @@ function applyBadge(product, data) {
     createBadgeElement(
       product,
       "Chinese Seller",
-      "#BC2C1A", // Hintergrund
-      "white", // Textfarbe
-      "logo-128.png", // Icon
-      data.sellerUrl, // Klickbar!
+      "#BC2C1A",
+      "white",
+      "logo-128.png",
+      data.sellerUrl,
     );
     incrementChinaCounter();
   } else if (data.name === "Amazon") {
@@ -42,7 +42,7 @@ function applyBadge(product, data) {
       "#28a745",
       "white",
       "logo-128.png",
-      null, // Kein Impressums-Link (daher nur Hover, kein Klick)
+      null,
     );
   } else if (data.isEU && config.markEU) {
     // eu badge
@@ -52,17 +52,17 @@ function applyBadge(product, data) {
       "#28a745",
       "white",
       "logo-128.png",
-      data.sellerUrl, // Klickbar!
+      data.sellerUrl,
     );
   } else {
     // "other" badge: UK, US, etc.
     createBadgeElement(
       product,
-      "International Seller", // Platzhalter-Text
-      "#28a745", // Neutrales Grau als Hintergrund
-      "white", // Textfarbe
-      "logo-128.png", // Icon
-      data.sellerUrl, // Klickbar, falls es ein Dritthändler mit Impressum ist!
+      "International Seller",
+      "#28a745",
+      "white",
+      "logo-128.png",
+      data.sellerUrl,
     );
   }
 }
@@ -119,13 +119,16 @@ function createBadgeElement(
 
   if (sellerUrl) {
     badge.classList.add("is-clickable"); // activates css hover effect
-
-    badge.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      window.open(sellerUrl, "_blank");
-    });
   }
+
+  badge.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (sellerUrl) {
+      window.open(sellerUrl, "_blank");
+    }
+  });
 
   // positioning: inline or absolute as fallback
   const titleElement = parent.querySelector("h2");
@@ -133,6 +136,19 @@ function createBadgeElement(
   if (titleElement) {
     badge.classList.add("badge-inline");
     titleElement.prepend(badge);
+
+    // suppress product link functionality and visual styles while hovering over badge
+    const amazonLink = titleElement.closest("a");
+
+    if (amazonLink) {
+      badge.addEventListener("mouseenter", () => {
+        amazonLink.classList.add("suppress-amz-hover");
+      });
+
+      badge.addEventListener("mouseleave", () => {
+        amazonLink.classList.remove("suppress-amz-hover");
+      });
+    }
   } else {
     badge.classList.add("badge-absolute");
     parent.appendChild(badge);
@@ -148,6 +164,7 @@ function injectBadgeStyles() {
   const style = document.createElement("style");
   style.id = "amz-badge-styles";
   style.textContent = `
+    /* main styling for badge */
     .custom-badge {
       display: inline-flex;
       align-items: center;
@@ -164,18 +181,20 @@ function injectBadgeStyles() {
       overflow: hidden; 
       pointer-events: auto;
       border: 1px solid transparent;
+      cursor: default !important;
     }
 
+    /* styling for clickable badges with url */
     .custom-badge.is-clickable {
-      cursor: pointer;
+      cursor: pointer !important;
     }
 
+    /* hover effect */
     .custom-badge.is-clickable:hover {
       transform: scale(1.05);
       filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));
     }
 
-    /* Das Icon */
     .custom-badge .badge-icon {
       width: 18px;
       height: 18px;
@@ -183,6 +202,7 @@ function injectBadgeStyles() {
       flex-shrink: 0;
     }
 
+    /* hidden text */
     .custom-badge .badge-text {
       max-width: 0;
       opacity: 0;
@@ -191,6 +211,7 @@ function injectBadgeStyles() {
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
+    /* expand text when hovering */
     .custom-badge:hover .badge-text {
       max-width: 120px; /* Breite für den Text */
       opacity: 1;
@@ -236,6 +257,13 @@ function injectBadgeStyles() {
       animation: badge-pulse 1.5s infinite ease-in-out;
       pointer-events: none !important; /* Blockiert Hover und Klicks während des Ladens */
       cursor: wait;
+    }
+
+    .suppress-amz-hover .a-text-normal,
+    .suppress-amz-hover h2,
+    .suppress-amz-hover span:not(.badge-text) {
+      color: #0f1111 !important; 
+      text-decoration: none !important;
     }
   `;
   document.head.appendChild(style);
