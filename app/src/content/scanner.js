@@ -67,6 +67,11 @@ const observer = new IntersectionObserver(
 function startScannerLoop() {
   if (!config.masterSwitch) return; // do not scan any products if master switch is switched off
 
+  // this makes sure extension doesn't work on amazons landing page
+  if (document.getElementById("gw-layout")) {
+    return;
+  }
+
   setInterval(() => {
     if (!isCacheLoaded) return;
     const products = document.querySelectorAll(activeConfig.productContainer);
