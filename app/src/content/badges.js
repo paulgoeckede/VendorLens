@@ -100,7 +100,9 @@ function createBadgeElement(
 
   if (
     parent.matches('div[id^="anonCarousel"] li') ||
-    parent.closest('div[id^="anonCarousel"] li')
+    parent.closest('div[id^="anonCarousel"] li') ||
+    parent.matches("div.octopus-pc-card-content li") ||
+    parent.closest("div.octopus-pc-card-content li")
   ) {
     positionStyles = `
       top: 0px; 
