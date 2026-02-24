@@ -93,46 +93,6 @@ function createBadgeElement(
   const badge = document.createElement("div");
   badge.className = "custom-badge";
 
-  let positionStyles = `
-    bottom: 10px; 
-    left: 5px; 
-  `;
-
-  if (
-    parent.matches('div[id^="anonCarousel"] li') ||
-    parent.closest('div[id^="anonCarousel"] li') ||
-    parent.matches("div.octopus-pc-card-content li") ||
-    parent.closest("div.octopus-pc-card-content li") ||
-    parent.matches("div.ProductCard-module__card_uyr_Jh7WpSkPx4iEpn4w") ||
-    parent.closest("div.ProductCard-module__card_uyr_Jh7WpSkPx4iEpn4w")
-  ) {
-    positionStyles = `
-      top: 0px; 
-      left: 5px; 
-  `;
-  }
-
-  badge.style.cssText = `
-    display: inline-flex;
-    align-items: center;
-    gap: 8px; 
-    padding: 4px 12px 4px 8px;
-    position: absolute;
-    ${positionStyles}
-    z-index: 5; 
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 600; 
-    font-size: 11px; 
-    letter-spacing: 0.03em;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
-    border-radius: 5px;
-    pointer-events: none; 
-    background-color: ${color}; 
-    color: ${textcolor};
-  `;
-
   if (iconFileName) {
     const icon = document.createElement("img");
     icon.src = chrome.runtime.getURL("assets/icons/" + iconFileName);
@@ -170,7 +130,55 @@ function createBadgeElement(
   textSpan.textContent = text;
   badge.appendChild(textSpan);
 
-  parent.appendChild(badge);
+  const titleElement = parent.querySelector("h2");
+
+  if (titleElement) {
+    badge.style.cssText = `
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; 
+    padding: 2px 6px;
+    margin-right: 8px; /* Abstand zwischen Badge und dem eigentlichen Produkttitel */
+    margin-bottom: 2px;
+    vertical-align: middle; /* Sorgt dafür, dass die Badge auf einer Linie mit dem Text bleibt */
+    border-radius: 4px; 
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 600; 
+    font-size: 11px; 
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: ${color}; 
+    color: ${textcolor};
+    /* Kein position: absolute und kein z-index mehr nötig! */
+  `;
+
+    titleElement.prepend(badge);
+  } else {
+    badge.style.cssText = `
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; 
+    padding: 4px 12px 4px 8px;
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    z-index: 5; 
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600; 
+    font-size: 11px; 
+    letter-spacing: 0.03em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
+    border-radius: 5px;
+    pointer-events: none; 
+    background-color: ${color}; 
+    color: ${textcolor};
+  `;
+
+    parent.appendChild(badge);
+  }
 }
 
 /**
