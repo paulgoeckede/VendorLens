@@ -130,7 +130,15 @@ function startScan(product) {
   }
 
   product.dataset.isScanned = "true";
-  createBadgeElement(product, "Loading..", "#e0e0e0", "#555", "logo-128.png"); // Loading badge
+  createBadgeElement(
+    product,
+    "Loading..",
+    "#9e9e9e",
+    "white",
+    "logo-128.png",
+    null,
+    true,
+  ); // Loading badge
 
   const fetchUrl = "https://" + currentDomain + cleanUrl;
 

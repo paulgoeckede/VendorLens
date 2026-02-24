@@ -12,58 +12,58 @@ function applyBadge(product, data) {
       if (product.dataset.isFading) return;
       product.dataset.isFading = "true";
 
-      // console.log("Verstecke Produkt von China-Händler: " + data.name);
+      // animation trigger
+      product.classList.add("fade-out-product");
 
-      product.style.transition =
-        "opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out";
-      product.style.opacity = "1";
-      product.style.transform = "scale(1)";
-      product.style.filter = "blur(0px)";
-
-      void product.offsetWidth; // Trigger reflow
-
-      // fade out logic
-      product.style.opacity = "0";
-      product.style.transform = "scale(0.9)";
-      product.style.filter = "blur(4px)";
-      product.style.pointerEvents = "none";
-
+      // wait until animation is finished, then remove from DOM
       setTimeout(() => {
         product.style.display = "none";
       }, 500);
 
       incrementChinaCounter();
-
       return;
     }
 
+    // china badge
     createBadgeElement(
       product,
       "Chinese Seller",
-      "#BC2C1A",
-      "white",
-      "logo-128.png",
-      data.sellerUrl,
+      "#BC2C1A", // Hintergrund
+      "white", // Textfarbe
+      "logo-128.png", // Icon
+      data.sellerUrl, // Klickbar!
     );
     incrementChinaCounter();
   } else if (data.name === "Amazon") {
-    createBadgeElement(product, "Amazon", "#169AEC", "white", "logo-128.png");
-
-    return;
+    // amazon badge
+    createBadgeElement(
+      product,
+      "Amazon",
+      "#28a745",
+      "white",
+      "logo-128.png",
+      null, // Kein Impressums-Link (daher nur Hover, kein Klick)
+    );
   } else if (data.isEU && config.markEU) {
+    // eu badge
     createBadgeElement(
       product,
       "EU Seller",
-      "#169AEC",
+      "#28a745",
       "white",
       "logo-128.png",
-      data.sellerUrl,
+      data.sellerUrl, // Klickbar!
     );
-
-    return;
   } else {
-    // product is neither from China, EU or Amazon
-    removeBadge(product);
+    // "other" badge: UK, US, etc.
+    createBadgeElement(
+      product,
+      "International Seller", // Platzhalter-Text
+      "#28a745", // Neutrales Grau als Hintergrund
+      "white", // Textfarbe
+      "logo-128.png", // Icon
+      data.sellerUrl, // Klickbar, falls es ein Dritthändler mit Impressum ist!
+    );
   }
 }
 
@@ -75,6 +75,7 @@ function applyBadge(product, data) {
  * @param {String} textcolor The textcolor of the textContent of the badge
  * @param {String} iconFileName The icon filename of the extension icon which will be placed inside the badge
  * @param {String} sellerUrl The sellers imprint URL which will be linked inside the badge
+ * @param {boolean} [isLoading=false] To check whether loading state should be applied to badge
  * @returns {void}
  */
 function createBadgeElement(
@@ -84,6 +85,7 @@ function createBadgeElement(
   textcolor,
   iconFileName,
   sellerUrl,
+  isLoading = false,
 ) {
   // remove old badge if there is one
   removeBadge(parent);
@@ -95,6 +97,10 @@ function createBadgeElement(
 
   const badge = document.createElement("div");
   badge.className = "custom-badge";
+
+  if (isLoading) {
+    badge.classList.add("is-loading");
+  }
 
   badge.style.backgroundColor = color;
   badge.style.color = textcolor;
@@ -119,8 +125,6 @@ function createBadgeElement(
       e.stopPropagation();
       window.open(sellerUrl, "_blank");
     });
-  } else {
-    badge.style.pointerEvents = "none";
   }
 
   // positioning: inline or absolute as fallback
@@ -155,14 +159,15 @@ function injectBadgeStyles() {
       -webkit-font-smoothing: antialiased;
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       box-shadow: 1px 1px 3px rgba(0,0,0,0.2); 
-      height: 22px; /* Fixe Höhe, damit beim Hovern nichts springt */
+      height: 22px; 
       box-sizing: border-box;
-      overflow: hidden;
+      overflow: hidden; 
+      pointer-events: auto;
+      border: 1px solid transparent;
     }
 
     .custom-badge.is-clickable {
       cursor: pointer;
-      pointer-events: auto;
     }
 
     .custom-badge.is-clickable:hover {
@@ -193,6 +198,7 @@ function injectBadgeStyles() {
       padding-right: 8px; /* Etwas Platz rechts */
     }
 
+    /* inline styling */
     .badge-inline {
       padding: 2px;
       margin-right: 8px;
@@ -200,12 +206,36 @@ function injectBadgeStyles() {
       vertical-align: middle;
     }
 
+    /* absolute styling */
     .badge-absolute {
       padding: 2px;
       position: absolute;
       top: 4px;
       right: 4px;
       z-index: 5; 
+    }
+
+    /* animation class for hiding chinese products */
+    .fade-out-product {
+      opacity: 0 !important;
+      transform: scale(0.9) !important;
+      filter: blur(4px) !important;
+      pointer-events: none !important;
+      transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out !important;
+    }
+
+    /* pulse animation for loading badge */
+    @keyframes badge-pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    /* class for loading badge */
+    .custom-badge.is-loading {
+      animation: badge-pulse 1.5s infinite ease-in-out;
+      pointer-events: none !important; /* Blockiert Hover und Klicks während des Ladens */
+      cursor: wait;
     }
   `;
   document.head.appendChild(style);
