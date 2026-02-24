@@ -5,7 +5,7 @@
 const localeConfigs = {
   main_config: {
     productContainer:
-      'div[data-component-type="s-search-result"], div[id^="anonCarousel"] li, div.octopus-pc-card-content li, div._octopus-search-result-card_style_apbSearchResultItem__2-mx4',
+      'div[data-component-type="s-search-result"], div[id^="anonCarousel"] li, div.octopus-pc-card-content li, div._octopus-search-result-card_style_apbSearchResultItem__2-mx4, div.ProductCard-module__card_uyr_Jh7WpSkPx4iEpn4w',
     productLink: "a",
     merchantContainer:
       'div.offer-display-feature-text[offer-display-feature-name="desktop-merchant-info"]',

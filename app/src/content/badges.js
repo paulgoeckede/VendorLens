@@ -102,7 +102,9 @@ function createBadgeElement(
     parent.matches('div[id^="anonCarousel"] li') ||
     parent.closest('div[id^="anonCarousel"] li') ||
     parent.matches("div.octopus-pc-card-content li") ||
-    parent.closest("div.octopus-pc-card-content li")
+    parent.closest("div.octopus-pc-card-content li") ||
+    parent.matches("div.ProductCard-module__card_uyr_Jh7WpSkPx4iEpn4w") ||
+    parent.closest("div.ProductCard-module__card_uyr_Jh7WpSkPx4iEpn4w")
   ) {
     positionStyles = `
       top: 0px; 

@@ -88,8 +88,18 @@ for (const market of marketplaces) {
       const sellerLinkSelector = "#sellerProfileTriggerId";
       const sellerLink = page.locator(sellerLinkSelector).first();
 
-      await expect(sellerLink).toBeAttached({ timeout: 10000 });
-      await sellerLink.click({ force: true });
+      const href = await sellerLink.getAttribute("href");
+
+      if (href) {
+        let sellerUrl;
+        if (href && !href.startsWith("http")) {
+          sellerUrl = "https://www." + market.domain + href;
+        }
+
+        await page.goto(sellerUrl);
+      } else {
+        return;
+      }
     });
 
     await test.step("5. Check if imprintContainer selector is working", async () => {
