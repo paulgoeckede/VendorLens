@@ -191,7 +191,6 @@ function injectBadgeStyles() {
 
     /* hover effect */
     .custom-badge.is-clickable:hover {
-      transform: scale(1.05);
       filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.3));
     }
 
