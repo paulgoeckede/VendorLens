@@ -101,18 +101,18 @@ describe("applyBadge Function", () => {
 
     applyBadge(product, { isFromChina: true, name: "Test Seller" });
 
-    // check if css styles have been set for fadeout
-    expect(product.style.opacity).toBe("0");
-    expect(product.style.pointerEvents).toBe("none");
+    // check if css animation class has been assigned
+    expect(product.classList.contains("fade-out-product")).toBe(true);
 
+    // check that display is not none at the start of animation
     expect(product.style.display).not.toBe("none");
 
+    // fast forward 500ms
     jest.advanceTimersByTime(500);
 
-    // check if product has disappeared
+    // check that display is none after animation is done
     expect(product.style.display).toBe("none");
 
-    // check if incrementChinaCounter has been called successfully
     expect(global.incrementChinaCounter).toHaveBeenCalledTimes(1);
   });
 
@@ -145,17 +145,29 @@ describe("applyBadge Function", () => {
     expect(badge.innerHTML).toContain("EU Seller");
   });
 
-  test("removes existing badge if seller matches no criteria", () => {
+  test("creates 'International Seller' fallback badge if seller matches no specific criteria", () => {
+    // simulate that there was an existing loading badge beforehand
     const oldBadge = document.createElement("div");
-    oldBadge.className = "custom-badge";
+    oldBadge.className = "custom-badge is-loading";
     product.appendChild(oldBadge);
 
-    applyBadge(
-      product,
-      { isFromChina: false, isEU: false, name: "Unknown" },
-      null,
-    );
+    // function call with vendor data not matching any regular criteria
+    applyBadge(product, {
+      isFromChina: false,
+      isEU: false,
+      name: "Unknown US Seller",
+      sellerUrl: "https://amazon.com/seller",
+    });
 
-    expect(product.querySelector(".custom-badge")).toBeNull();
+    // check if there is any badge at all
+    const badge = product.querySelector(".custom-badge");
+    expect(badge).not.toBeNull();
+
+    // check if badge has the expected text content
+    const badgeText = badge.querySelector(".badge-text");
+    expect(badgeText.textContent).toBe("International Seller");
+
+    // check removal of loading badge
+    expect(badge.classList.contains("is-loading")).toBe(false);
   });
 });
