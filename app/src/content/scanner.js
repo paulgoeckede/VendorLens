@@ -167,13 +167,10 @@ function startScan(product) {
  * @returns {void}
  */
 function startDeepScan(url, product) {
-  const link = url;
-  // console.log("Starte Analyse für Produkt: " + link);
-
   chrome.runtime.sendMessage(
     {
       action: "fetchPage",
-      url: link,
+      url: url,
     },
     function (response) {
       if (response && response.html) {
@@ -214,15 +211,12 @@ function startDeepScan(url, product) {
             }
           }
         } else {
-          // Wenn kein Verkäufer Container auf der Produktseite gefunden wurde.
-          // console.log("Layout-Fehler: Kein Verkäufer-Container gefunden.");
           removeBadge(product);
           return;
         }
 
         // final check to avoid empty seller names
         if (!sellerName) {
-          // console.log("Container gefunden, aber Name leer.");
           removeBadge(product);
           return;
         }
@@ -231,19 +225,7 @@ function startDeepScan(url, product) {
         if (sellerCache[sellerName]) {
           const cachedData = sellerCache[sellerName];
           applyBadge(product, cachedData);
-
-          // save asin info to session cache
-          const asinContainer = product.closest("[data-asin]");
-          const foundAsin = asinContainer
-            ? asinContainer.getAttribute("data-asin")
-            : extractAsinFromUrl(sellerUrl);
-
-          if (foundAsin) {
-            sessionStorage.setItem(
-              "asin_cache_" + foundAsin,
-              JSON.stringify(cachedData),
-            );
-          }
+          saveAsinToSessionCache(product, url, cachedData);
 
           return;
         }
@@ -253,7 +235,7 @@ function startDeepScan(url, product) {
           const resultData = {
             name: "Amazon",
             sellerUrl: "",
-            text: "Verkauf und Versand durch Amazon",
+            text: "Sold by Amazon",
             origin: "",
           };
 
@@ -262,22 +244,13 @@ function startDeepScan(url, product) {
           chrome.storage.local.set({ cachedSellers: sellerCache });
 
           applyBadge(product, resultData);
-          // save asin info to session cache
-          const foundAsin = product.getAttribute("data-asin");
-          if (foundAsin) {
-            sessionStorage.setItem(
-              "asin_cache_" + foundAsin,
-              JSON.stringify(resultData),
-            );
-          }
+          saveAsinToSessionCache(product, url, resultData);
 
           return;
         }
 
         // case: third party seller
         if (sellerUrl) {
-          // console.log("Händler neu: " + sellerName + ". Lade Impressum...");
-
           // fetch seller profile page through background script
           chrome.runtime.sendMessage(
             {
@@ -312,15 +285,8 @@ function startDeepScan(url, product) {
                   applyBadge(product, resultData);
 
                   // save asin info to session cache
-                  const foundAsin = extractAsinFromUrl(sellerUrl);
-                  if (foundAsin) {
-                    sessionStorage.setItem(
-                      "asin_cache_" + foundAsin,
-                      JSON.stringify(resultData),
-                    );
-                  }
+                  saveAsinToSessionCache(product, url, resultData);
                 } else {
-                  // console.log("Impressum nicht gefunden für: " + sellerName);
                   removeBadge(product);
                 }
               }
@@ -328,8 +294,6 @@ function startDeepScan(url, product) {
           );
         }
       } else {
-        // Fehlerbehandlung für den ersten Fetch
-        // console.log("Konnte Produktseite nicht laden.");
         removeBadge(product);
       }
     },

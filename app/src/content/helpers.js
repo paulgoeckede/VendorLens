@@ -83,6 +83,26 @@ function incrementChinaCounter() {
   });
 }
 
+/**
+ * Function to save the ASIN from a given product to session Cache
+ * @param {HTMLElement} product Product element on search result page
+ * @param {String} productLink Link to product page as fallback
+ * @param {Object} cachedData Seller info to be saved
+ */
+function saveAsinToSessionCache(product, productLink, cachedData) {
+  const asinContainer = product.closest("[data-asin]");
+  const foundAsin = asinContainer
+    ? asinContainer.getAttribute("data-asin")
+    : extractAsinFromUrl(productLink);
+
+  if (foundAsin) {
+    sessionStorage.setItem(
+      "asin_cache_" + foundAsin,
+      JSON.stringify(cachedData),
+    );
+  }
+}
+
 // conditional export for jest (ignored by browser)
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
