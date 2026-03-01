@@ -38,7 +38,7 @@ describe("UI Badge Functions", () => {
     createBadgeElement(
       parent,
       "Chinese Seller",
-      "#d00",
+      "#BC2C1A", // An den neuen Rot-Ton aus deiner Datei angepasst
       "white",
       "logo-128.png",
       "https://seller.url",
@@ -48,10 +48,10 @@ describe("UI Badge Functions", () => {
 
     expect(badge).not.toBeNull();
 
-    const textSpan = badge.querySelector("span");
+    const textSpan = badge.querySelector(".badge-text"); // Geändert: Du nutzt jetzt die Klasse .badge-text
     expect(textSpan.textContent).toBe("Chinese Seller");
 
-    expect(badge.style.backgroundColor).toBe("rgb(221, 0, 0)");
+    expect(badge.style.backgroundColor).toBe("rgb(188, 44, 26)"); // RGB Wert für #BC2C1A
 
     const icon = badge.querySelector("img");
     expect(icon).not.toBeNull();
@@ -70,9 +70,10 @@ describe("applyBadge Function", () => {
     global.config = {
       masterSwitch: true,
       hideChina: false,
-      sellerUrl: "https://url",
-      markEU: true,
     };
+
+    // mock variable
+    global.currentDomainCountry = "DE";
 
     // mock function to count times called
     global.incrementChinaCounter = jest.fn();
@@ -90,7 +91,7 @@ describe("applyBadge Function", () => {
   test("does nothing if masterSwitch is false", () => {
     global.config.masterSwitch = false;
 
-    applyBadge(product, { isFromChina: true });
+    applyBadge(product, { origin: "CN", sellerUrl: "https://url" });
 
     expect(product.innerHTML).toBe("");
     expect(global.incrementChinaCounter).not.toHaveBeenCalled();
@@ -99,7 +100,11 @@ describe("applyBadge Function", () => {
   test("fades out and hides product if china seller and hideChina is true", () => {
     global.config.hideChina = true;
 
-    applyBadge(product, { isFromChina: true, name: "Test Seller" });
+    applyBadge(product, {
+      origin: "CN",
+      name: "Test Seller",
+      sellerUrl: "https://url",
+    });
 
     // check if css animation class has been assigned
     expect(product.classList.contains("fade-out-product")).toBe(true);
@@ -119,7 +124,7 @@ describe("applyBadge Function", () => {
   test("applies china badge if hideChina is false", () => {
     global.config.hideChina = false;
 
-    applyBadge(product, { isFromChina: true }, "https://url");
+    applyBadge(product, { origin: "CN", sellerUrl: "https://url" });
 
     const badge = product.querySelector(".custom-badge");
     expect(badge).not.toBeNull();
@@ -128,21 +133,20 @@ describe("applyBadge Function", () => {
   });
 
   test("applies amazon badge if seller is Amazon", () => {
-    applyBadge(product, { isFromChina: false, name: "Amazon" }, null);
+    // is name is amazon origin is irrelevant
+    applyBadge(product, { name: "Amazon", origin: "UNKNOWN" });
 
     const badge = product.querySelector(".custom-badge");
     expect(badge).not.toBeNull();
     expect(badge.innerHTML).toContain("Amazon");
   });
 
-  test("applies EU badge if seller is from EU and markEU is true", () => {
-    global.config.markEU = true;
-
-    applyBadge(product, { isFromChina: false, isEU: true }, "https://url");
+  test("applies 'Local Seller' badge if seller origin matches currentDomainCountry", () => {
+    applyBadge(product, { origin: "DE", sellerUrl: "https://url" });
 
     const badge = product.querySelector(".custom-badge");
     expect(badge).not.toBeNull();
-    expect(badge.innerHTML).toContain("EU Seller");
+    expect(badge.innerHTML).toContain("Local Seller");
   });
 
   test("creates 'International Seller' fallback badge if seller matches no specific criteria", () => {
@@ -151,10 +155,9 @@ describe("applyBadge Function", () => {
     oldBadge.className = "custom-badge is-loading";
     product.appendChild(oldBadge);
 
-    // function call with vendor data not matching any regular criteria
+    // function call with vendor data not matching Amazon, CN, or the currentDomainCountry ("DE")
     applyBadge(product, {
-      isFromChina: false,
-      isEU: false,
+      origin: "US",
       name: "Unknown US Seller",
       sellerUrl: "https://amazon.com/seller",
     });

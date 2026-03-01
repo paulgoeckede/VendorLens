@@ -107,5 +107,7 @@ function saveAsinToSessionCache(product, productLink, cachedData) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     extractAsinFromUrl,
+    detectSellerOrigin,
+    saveAsinToSessionCache,
   };
 }
