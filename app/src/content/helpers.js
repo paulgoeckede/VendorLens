@@ -40,7 +40,7 @@ function extractAsinFromUrl(url) {
  * @returns {String} The sellers country code or UNKNOWN
  */
 function detectSellerOrigin(text) {
-  if (!text) return "UNKNOWN";
+  if (!text) return "INTERNATIONAL";
 
   const lowerText = text.toLowerCase();
 
@@ -68,7 +68,7 @@ function detectSellerOrigin(text) {
     return "CN";
   }
 
-  return "UNKNOWN";
+  return "INTERNATIONAL";
 }
 
 /**
@@ -107,7 +107,5 @@ function saveAsinToSessionCache(product, productLink, cachedData) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     extractAsinFromUrl,
-    isChinaSeller,
-    isEUSeller,
   };
 }

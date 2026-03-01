@@ -21,8 +21,7 @@ const domainToCountryMap = {
   "amazon.fr": "FR",
 };
 
-const currentDomainCountry =
-  domainToCountryMap[currentDomain] || "INTERNATIONAL";
+const currentDomainCountry = domainToCountryMap[currentDomain] || "INVALID";
 
 /** LOAD SETTINGS AND CACHE */
 

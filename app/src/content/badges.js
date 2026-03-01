@@ -39,7 +39,7 @@ function applyBadge(product, data) {
     createBadgeElement(
       product,
       "Amazon",
-      "#28a745",
+      "#169AEC",
       "white",
       "logo-128.png",
       null,
@@ -54,22 +54,12 @@ function applyBadge(product, data) {
       "logo-128.png",
       data.sellerUrl,
     );
-  } else if (data.origin === "EU") {
-    // eu badge
-    createBadgeElement(
-      product,
-      "EU Seller",
-      "#28a745",
-      "white",
-      "logo-128.png",
-      data.sellerUrl,
-    );
   } else {
     // "other" badge: UK, US, etc.
     createBadgeElement(
       product,
       "International Seller",
-      "#28a745",
+      "#169AEC",
       "white",
       "logo-128.png",
       data.sellerUrl,
