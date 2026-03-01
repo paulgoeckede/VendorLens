@@ -12,6 +12,18 @@ let config = {
   hideChina: false,
 };
 
+const domainToCountryMap = {
+  "amazon.de": "DE",
+  "amazon.com": "US",
+  "amazon.co.uk": "GB",
+  "amazon.it": "IT",
+  "amazon.es": "ES",
+  "amazon.fr": "FR",
+};
+
+const currentDomainCountry =
+  domainToCountryMap[currentDomain] || "INTERNATIONAL";
+
 /** LOAD SETTINGS AND CACHE */
 
 // load config from storage and apply defaults if not set
@@ -239,11 +251,10 @@ function startDeepScan(url, product) {
         // check if the seller is Amazon itself based on the name or other indicators, as Amazon's own products often don't have a link to a seller profile and require a different handling than third-party sellers
         if (isAmazon || sellerName === "Amazon") {
           const resultData = {
-            isFromChina: false,
-            isEU: false,
             name: "Amazon",
             sellerUrl: "",
             text: "Verkauf und Versand durch Amazon",
+            origin: "",
           };
 
           // store and cache the results, apply badge, and return early since we don't need to fetch a seller profile for Amazon itself
@@ -286,20 +297,13 @@ function startDeepScan(url, product) {
                 );
 
                 if (addressElement) {
-                  const addressText = addressElement.textContent.trim();
-                  const isFromChina = isChinaSeller(addressText); // check if the seller is from China based on the imprint information
-                  let isEU = false;
-
-                  if (!isFromChina) {
-                    isEU = isEUSeller(addressText); // if not from China, check if it's from the EU based on the imprint information
-                  }
+                  const addressText = addressElement.innerHTML.trim();
 
                   const resultData = {
-                    isFromChina: isFromChina,
-                    isEU: isEU,
                     name: sellerName,
                     sellerUrl: sellerUrl,
                     text: addressText,
+                    origin: detectSellerOrigin(addressText),
                   };
 
                   // store and cache the results for this seller to speed up future scans of products from the same seller and reduce the number of fetches needed

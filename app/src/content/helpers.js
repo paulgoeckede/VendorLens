@@ -35,49 +35,40 @@ function extractAsinFromUrl(url) {
 }
 
 /**
- * Function to check if seller is from China based on known keywords.
- * @param {String} text The imprint/adress information of a vendor
- * @returns {boolean} Returns whether the given vendor is based in China or Hongkong.
+ * Function to check a given imprint text against known keywords to identify a sellers origin.
+ * @param {String} text A sellers imprint
+ * @returns {String} The sellers country code or UNKNOWN
  */
-function isChinaSeller(text) {
-  if (!text) return false;
+function detectSellerOrigin(text) {
+  if (!text) return "UNKNOWN";
 
   const lowerText = text.toLowerCase();
 
-  const hasKeyword = chinaKeywords.some((keyword) =>
-    lowerText.includes(keyword),
-  );
-  if (hasKeyword) return true;
+  // check imprint text for country codes
+  for (const rule of regionRules) {
+    if (rule.exactMatches && rule.exactMatches.length > 0) {
+      for (const match of rule.exactMatches) {
+        const regex = new RegExp(`>[\\s\\n]*${match}[\\s\\n]*<`); // format >US<, >DE<, >FR< and so on..
+        if (regex.test(text)) {
+          return rule.id;
+        }
+      }
+    }
+  }
 
-  if (text.includes("+86")) return true; // China
-  if (text.includes("+852")) return true; // Hongkong
+  // check imprint text for known country keywords
+  for (const rule of regionRules) {
+    if (rule.keywords && rule.keywords.some((kw) => lowerText.includes(kw))) {
+      return rule.id;
+    }
+  }
 
-  if (text.includes("CN")) return true;
-  if (text.includes("CHN")) return true;
-  if (text.includes("HK")) return true;
+  // double check if text includes chinese phonenumbers if no keywords matched
+  if (text.includes("+86") || text.includes("+852")) {
+    return "CN";
+  }
 
-  return false;
-}
-
-/**
- * Function to check if a vendor is from EU based on known keywords.
- * @param {String} text The imprint/adress information of a vendor.
- * @returns {String} Returns whether the given vendor is based in the EU.
- */
-function isEUSeller(text) {
-  if (!text) return false;
-
-  const lowerText = text.toLowerCase();
-
-  const hasCountryName = euKeywords.some((keyword) =>
-    lowerText.includes(keyword),
-  );
-  if (hasCountryName) return true;
-
-  const hasPhoneCode = euPhoneCodes.some((code) => text.includes(code));
-  if (hasPhoneCode) return true;
-
-  return false;
+  return "UNKNOWN";
 }
 
 /**

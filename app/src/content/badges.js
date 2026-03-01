@@ -7,7 +7,7 @@
 function applyBadge(product, data) {
   if (!config.masterSwitch) return;
 
-  if (data.isFromChina) {
+  if (data.origin === "CN") {
     if (config.hideChina) {
       if (product.dataset.isFading) return;
       product.dataset.isFading = "true";
@@ -44,7 +44,17 @@ function applyBadge(product, data) {
       "logo-128.png",
       null,
     );
-  } else if (data.isEU) {
+  } else if (data.origin === currentDomainCountry) {
+    // local badge
+    createBadgeElement(
+      product,
+      "Local Seller",
+      "#28a745",
+      "white",
+      "logo-128.png",
+      data.sellerUrl,
+    );
+  } else if (data.origin === "EU") {
     // eu badge
     createBadgeElement(
       product,
