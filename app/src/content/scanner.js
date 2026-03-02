@@ -10,6 +10,7 @@ const activeConfig =
 let config = {
   masterSwitch: true,
   hideChina: false,
+  onlyLocal: false,
 };
 
 const domainToCountryMap = {
@@ -48,7 +49,8 @@ chrome.runtime.onMessage.addListener((request) => {
 
     if (
       request.settings.hideChina !== undefined ||
-      request.settings.masterSwitch !== undefined
+      request.settings.masterSwitch !== undefined ||
+      request.settings.onlyLocal !== undefined
     ) {
       location.reload();
     }
