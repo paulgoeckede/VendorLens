@@ -7,23 +7,15 @@
 function applyBadge(product, data) {
   if (!config.masterSwitch) return;
 
-  if (data.origin === "CN") {
+  if (config.onlyLocal && data.origin != currentDomainCountry) {
+    hideProduct(product);
+    return;
+  } else if (data.origin === "CN") {
     if (config.hideChina) {
-      if (product.dataset.isFading) return;
-      product.dataset.isFading = "true";
-
-      // animation trigger
-      product.classList.add("fade-out-product");
-
-      // wait until animation is finished, then remove from DOM
-      setTimeout(() => {
-        product.style.display = "none";
-      }, 500);
-
+      hideProduct(product);
       incrementChinaCounter();
       return;
     }
-
     // china badge
     createBadgeElement(
       product,
@@ -278,6 +270,23 @@ function removeBadge(parent) {
   if (oldBadge) {
     oldBadge.remove();
   }
+}
+
+/**
+ * Function to play a fade out animation and then remove product from DOM.
+ * @param {HTMLElement} product The product to be hidden.
+ */
+function hideProduct(product) {
+  if (product.dataset.isFading) return;
+  product.dataset.isFading = "true";
+
+  // animation trigger
+  product.classList.add("fade-out-product");
+
+  // wait until animation is finished, then remove from DOM
+  setTimeout(() => {
+    product.style.display = "none";
+  }, 500);
 }
 
 // conditional export for jest (ignored by browser)
