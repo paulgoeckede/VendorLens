@@ -64,9 +64,11 @@ for (const market of marketplaces) {
 
     // open search result page
     const page = await browserContext.newPage();
-    (await (market.domain != "amazon.com"))
-      ? page.goto(`${market.categoryLink}`)
-      : page.goto(`${market.dealLink}`);
+    if (market.domain !== "amazon.com") {
+      await page.goto(`${market.categoryLink}`);
+    } else {
+      await page.goto(`${market.dealLink}`);
+    }
 
     // scroll down a bit to fully load everything
     for (let i = 0; i < 5; i++) {

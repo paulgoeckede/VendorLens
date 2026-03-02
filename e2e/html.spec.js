@@ -62,15 +62,16 @@ for (const market of marketplaces) {
     await test.step("2. Check if productContainer and sellerLink selectors are working", async () => {
       const productContainerSelector =
         'div[data-component-type="s-search-result"]';
+
       const productContainer = page
         .locator(productContainerSelector, {
-          has: page.locator(".custom-badge", {
-            hasText: /(EU Seller|Chinese Seller)/,
+          has: page.locator(".custom-badge:not(.is-loading)", {
+            hasText: /(Local Seller|International Seller|Chinese Seller)/,
           }),
         })
         .first();
 
-      await expect(productContainer).toBeVisible({ timeout: 10000 });
+      await expect(productContainer).toBeVisible({ timeout: 15000 });
 
       const productLink = productContainer.locator("a").first();
       await productLink.click();
@@ -91,10 +92,9 @@ for (const market of marketplaces) {
       const href = await sellerLink.getAttribute("href");
 
       if (href) {
-        let sellerUrl;
-        if (href && !href.startsWith("http")) {
-          sellerUrl = "https://www." + market.domain + href;
-        }
+        const sellerUrl = href.startsWith("http")
+          ? href
+          : `https://www.${market.domain}${href}`;
 
         await page.goto(sellerUrl);
       } else {

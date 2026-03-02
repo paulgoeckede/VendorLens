@@ -56,7 +56,9 @@ for (const market of marketplaces) {
     });
 
     await test.step("2. Check that result badges have been applied properly", async () => {
-      await expect(firstBadge).not.toHaveText("Loading..", { timeout: 15000 });
+      await expect(firstBadge).not.toHaveClass(/is-loading/, {
+        timeout: 15000,
+      });
     });
 
     await test.step("3. Check that ASIN data gets stored to session cache and scan is bypassed if ASIN data is available", async () => {
@@ -76,10 +78,11 @@ for (const market of marketplaces) {
 
       const sampleData = JSON.parse(sessionData[cachedAsins[0]]);
       expect(sampleData).toBeDefined();
+      expect(sampleData.origin).toBeDefined();
 
       const productWithGuaranteedBadge = page
         .locator('div[data-component-type="s-search-result"]', {
-          has: page.locator(".custom-badge", { hasNotText: "Loading.." }),
+          has: page.locator(".custom-badge:not(.is-loading)"),
         })
         .first();
 
@@ -119,7 +122,7 @@ for (const market of marketplaces) {
           .first();
 
         await expect(specificBadge).toBeVisible({ timeout: 5000 });
-        await expect(specificBadge).not.toHaveText("Loading..", {
+        await expect(specificBadge).not.toHaveClass(/is-loading/, {
           timeout: 5000,
         });
       } else {
