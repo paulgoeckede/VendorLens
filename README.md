@@ -4,7 +4,9 @@
 
 # VendorLens
 
-VendorLens is a browser extension for Google Chrome and Mozilla Firefox that analyzes product and seller information on Amazon. It helps to transparently highlight or hide sellers from specific regions (such as China or the EU) directly on the search results page.
+Amazon's search results are increasingly flooded with low-quality products from anonymous resellers.
+
+VendorLens is a browser extension for Google Chrome and Mozilla Firefox that analyzes product and seller information on Amazon. It helps to transparently highlight or hide sellers from specific regions directly on the search results page.
 
 ## Features
 
@@ -13,6 +15,9 @@ VendorLens is a browser extension for Google Chrome and Mozilla Firefox that ana
 - **Filter Function (Hide China):** Completely hides products from Chinese sellers from the search results if desired.
 - **Badge Counter:** Counts the detected sellers and displays the number directly on the extension icon.
 - **Master Switch:** The entire extension can be activated or deactivated with a single click in the popup.
+
+![VendorLens in action](images/hero.png)
+![VendorLens hover](images/hover.png)
 
 ## Architecture & Tech Stack
 
