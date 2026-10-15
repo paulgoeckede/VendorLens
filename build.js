@@ -7,6 +7,10 @@ const distDir = "./dist";
 const releaseDir = "./releases";
 const chromeDir = `${distDir}/chrome`;
 const firefoxDir = `${distDir}/firefox`;
+const chromeStoreRef =
+  "https://chromewebstore.google.com/detail/vendorlens-amazon-seller/fkgibkppfgkjbaefggpmbnfmdlmbkfml?authuser=1&hl=de";
+const firefoxStoreRef =
+  "https://addons.mozilla.org/en/firefox/addon/vendorlens-seller-info/";
 
 console.log(`Starting build and zip process for version ${version}..`);
 
@@ -24,7 +28,7 @@ fs.cpSync(srcDir, chromeDir, { recursive: true });
 fs.cpSync(srcDir, firefoxDir, { recursive: true });
 
 // adjust manifests
-const updateExtensionFiles = (targetDir, manifestName) => {
+const updateExtensionFiles = (targetDir, manifestName, storeUrl) => {
   // rename manifest and set version number
   const manifestPath = `${targetDir}/manifest.json`;
   const tempManifestPath = `${targetDir}/${manifestName}`;
@@ -43,13 +47,14 @@ const updateExtensionFiles = (targetDir, manifestName) => {
   if (fs.existsSync(popupPath)) {
     let html = fs.readFileSync(popupPath, "utf8");
     html = html.replace(/__VERSION__/g, version);
+    html = html.replace(/__STORE_URL__/g, storeUrl);
     fs.writeFileSync(popupPath, html);
   }
 };
 
 console.log("Updating versions in manifests and html..");
-updateExtensionFiles(chromeDir, "manifest.chrome.json");
-updateExtensionFiles(firefoxDir, "manifest.firefox.json");
+updateExtensionFiles(chromeDir, "manifest.chrome.json", chromeStoreRef);
+updateExtensionFiles(firefoxDir, "manifest.firefox.json", firefoxStoreRef);
 
 // zip
 function createZip(sourceDir, outPath) {

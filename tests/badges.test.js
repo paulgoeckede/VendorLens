@@ -38,7 +38,7 @@ describe("UI Badge Functions", () => {
     createBadgeElement(
       parent,
       "Chinese Seller",
-      "#BC2C1A", // An den neuen Rot-Ton aus deiner Datei angepasst
+      "#BC2C1A",
       "white",
       "logo-128.png",
       "https://seller.url",
@@ -48,10 +48,10 @@ describe("UI Badge Functions", () => {
 
     expect(badge).not.toBeNull();
 
-    const textSpan = badge.querySelector(".badge-text"); // Geändert: Du nutzt jetzt die Klasse .badge-text
+    const textSpan = badge.querySelector(".badge-text");
     expect(textSpan.textContent).toBe("Chinese Seller");
 
-    expect(badge.style.backgroundColor).toBe("rgb(188, 44, 26)"); // RGB Wert für #BC2C1A
+    expect(badge.style.backgroundColor).toBe("rgb(188, 44, 26)");
 
     const icon = badge.querySelector("img");
     expect(icon).not.toBeNull();
@@ -77,6 +77,7 @@ describe("applyBadge Function", () => {
 
     // mock function to count times called
     global.incrementChinaCounter = jest.fn();
+    global.recordSuccessfulScan = jest.fn();
 
     // fake timer for setTimeout
     jest.useFakeTimers();

@@ -1,3 +1,16 @@
+// Zählerstand im Popup anzeigen
+chrome.storage.local.get({ scannedCount: 0, chinaCount: 0 }, (data) => {
+  const countEl = document.getElementById("scannedCount");
+  if (countEl) {
+    countEl.textContent = Number(data.scannedCount) || 0;
+  }
+
+  const chinaCountEl = document.getElementById("chinaCount");
+  if (chinaCountEl) {
+    chinaCountEl.textContent = Number(data.chinaCount) || 0;
+  }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const defaults = {
     masterSwitch: true,

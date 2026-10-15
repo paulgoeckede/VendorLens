@@ -21,6 +21,7 @@ function applyBadge(product, data) {
       }, 500);
 
       incrementChinaCounter();
+      recordSuccessfulScan(true);
       return;
     }
 
@@ -34,6 +35,7 @@ function applyBadge(product, data) {
       data.sellerUrl,
     );
     incrementChinaCounter();
+    recordSuccessfulScan(true);
   } else if (data.name === "Amazon") {
     // amazon badge
     createBadgeElement(
@@ -44,6 +46,7 @@ function applyBadge(product, data) {
       "logo-128.png",
       null,
     );
+    recordSuccessfulScan(false);
   } else if (data.origin === currentDomainCountry) {
     // local badge
     createBadgeElement(
@@ -54,6 +57,7 @@ function applyBadge(product, data) {
       "logo-128.png",
       data.sellerUrl,
     );
+    recordSuccessfulScan(false);
   } else {
     // "other" badge: UK, US, etc.
     createBadgeElement(
@@ -64,6 +68,7 @@ function applyBadge(product, data) {
       "logo-128.png",
       data.sellerUrl,
     );
+    recordSuccessfulScan(false);
   }
 }
 
